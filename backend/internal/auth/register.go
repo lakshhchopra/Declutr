@@ -15,6 +15,14 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if req.Email == "" ||
+		req.SRPVerifier == "" ||
+		req.SRPSalt == "" ||
+		req.MVK.Ciphertext == "" {
+		http.Error(w, "missing required fields", http.StatusBadRequest)
+		return
+	}
+
 	resp := authmodels.RegisterResponse{
 		UserID: "user_test_123",
 	}
