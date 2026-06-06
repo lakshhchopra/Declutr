@@ -1,31 +1,35 @@
 package auth
 
-import (
+	import (
 	"time"
 
 	"github.com/google/uuid"
 
+	authmodels "github.com/diablovocado/declutr/internal/auth/models"
+	"github.com/diablovocado/declutr/internal/crypto"
 	"github.com/diablovocado/declutr/internal/models"
 	"github.com/diablovocado/declutr/internal/repository"
 )
+
 
 type Service struct {
 	UserRepo repository.UserRepository
 }
 
-func (s *Service) Register() (string, error) {
+func (s *Service) Register(req authmodels.RegisterRequest) (string, error) {
 	id := uuid.New().String()
 
 	user := models.User{
-		ID:        id,
-		EmailHash: "temporary-email-hash",
+		ID: id,
 
-		SRPVerifier: "temporary-verifier",
-		SRPSalt:     "temporary-salt",
+		EmailHash: crypto.HashEmail(req.Email),
 
-		EncryptedMVKCiphertext: "temporary-ciphertext",
-		EncryptedMVKNonce:      "temporary-nonce",
-		EncryptedMVKVersion:    1,
+		SRPVerifier: req.SRPVerifier,
+		SRPSalt:     req.SRPSalt,
+
+		EncryptedMVKCiphertext: req.MVK.Ciphertext,
+		EncryptedMVKNonce:      req.MVK.Nonce,
+		EncryptedMVKVersion:    req.MVK.Version,
 
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
