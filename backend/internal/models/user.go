@@ -3,10 +3,12 @@ package models
 import "time"
 
 type User struct {
-	ID                     string
-	EmailHash             string
-	SRPVerifier           string
-	SRPSalt               string
+	ID string
+
+	EmailHash string
+
+	SRPVerifier string
+	SRPSalt     string
 
 	EncryptedMVKCiphertext string
 	EncryptedMVKNonce      string
