@@ -21,7 +21,12 @@ func (s *Service) LoginFinish(
 		return nil, fmt.Errorf("challenge expired")
 	}
 
-	_ = challenge
+	if !s.SRP.VerifyClientProof(
+		req.ClientProof,
+		challenge.ServerSecret,
+	) {
+		return nil, fmt.Errorf("invalid proof")
+	}
 
 	// Single-use challenge
 	delete(s.Challenges.Challenges, req.ChallengeID)

@@ -1,22 +1,21 @@
 package auth
 
-	import (
+import (
 	"time"
 
 	"github.com/google/uuid"
 
 	authmodels "github.com/diablovocado/declutr/internal/auth/models"
+	"github.com/diablovocado/declutr/internal/auth/srp"
 	"github.com/diablovocado/declutr/internal/crypto"
 	"github.com/diablovocado/declutr/internal/models"
 	"github.com/diablovocado/declutr/internal/repository"
-	"github.com/diablovocado/declutr/internal/auth/srp"
-	
 )
 
-
 type Service struct {
-    UserRepo repository.UserRepository
-    Challenges *srp.ChallengeStore
+	UserRepo   repository.UserRepository
+	Challenges *srp.ChallengeStore
+	SRP        *srp.Engine
 }
 
 func (s *Service) Register(req authmodels.RegisterRequest) (string, error) {

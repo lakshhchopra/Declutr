@@ -1,8 +1,6 @@
 package auth
 
 import (
-	"crypto/rand"
-	"encoding/hex"
 	"time"
 
 	"github.com/google/uuid"
@@ -11,12 +9,6 @@ import (
 	"github.com/diablovocado/declutr/internal/auth/srp"
 	"github.com/diablovocado/declutr/internal/crypto"
 )
-
-func randomHex(n int) string {
-	b := make([]byte, n)
-	rand.Read(b)
-	return hex.EncodeToString(b)
-}
 
 func (s *Service) LoginStart(
 	req authmodels.LoginStartRequest,
@@ -35,8 +27,8 @@ func (s *Service) LoginStart(
 		ID:     challengeID,
 		UserID: user.ID,
 
-		ServerSecret:    randomHex(32),
-		ServerPublicKey: randomHex(32),
+		ServerSecret:    s.SRP.GenerateServerSecret(),
+		ServerPublicKey: s.SRP.GenerateServerPublicKey(),
 
 		CreatedAt: time.Now(),
 	}

@@ -21,6 +21,7 @@ func main() {
 	authService := &auth.Service{
 		UserRepo:   userRepo,
 		Challenges: srp.NewChallengeStore(),
+		SRP:        srp.NewEngine(),
 	}
 
 	http.HandleFunc("/health", health.Handler)
