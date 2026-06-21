@@ -23,6 +23,9 @@ func (s *Service) LoginFinish(
 
 	_ = challenge
 
+	// Single-use challenge
+	delete(s.Challenges.Challenges, req.ChallengeID)
+
 	return &authmodels.LoginFinishResponse{
 		ServerProof: "temporary-server-proof",
 		AccessToken: "temporary-access-token",
