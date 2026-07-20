@@ -8,6 +8,7 @@ import (
 	"github.com/diablovocado/declutr/internal/auth/srp"
 	"github.com/diablovocado/declutr/internal/database"
 	"github.com/diablovocado/declutr/internal/health"
+	"github.com/diablovocado/declutr/internal/middleware"
 	"github.com/diablovocado/declutr/internal/repository"
 )
 
@@ -34,6 +35,10 @@ func main() {
 	http.HandleFunc(
 		"/api/v1/auth/login/start",
 		auth.LoginStartHandler(authService),
+	)
+	http.Handle(
+		"/api/v1/me",
+		middleware.Auth(userRepo)(auth.MeHandler()),
 	)
 
 	http.HandleFunc(

@@ -4,7 +4,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/google/uuid"
+
 	authmodels "github.com/diablovocado/declutr/internal/auth/models"
+	"github.com/diablovocado/declutr/internal/auth/session"
+	"github.com/diablovocado/declutr/internal/models"
 )
 
 func (s *Service) LoginFinish(
@@ -31,8 +35,25 @@ func (s *Service) LoginFinish(
 	// Single-use challenge
 	delete(s.Challenges.Challenges, req.ChallengeID)
 
+	// Generate a real access token
+	accessToken := session.GenerateAccessToken()
+
+	// Create a session
+	newSession := models.Session{
+		ID:          uuid.New().String(),
+		UserID:      challenge.UserID,
+		AccessToken: accessToken,
+		CreatedAt:   time.Now(),
+		ExpiresAt:   time.Now().Add(24 * time.Hour),
+	}
+
+	// Store the session
+	if err := s.UserRepo.CreateSession(newSession); err != nil {
+		return nil, err
+	}
+
 	return &authmodels.LoginFinishResponse{
 		ServerProof: "temporary-server-proof",
-		AccessToken: "temporary-access-token",
+		AccessToken: accessToken,
 	}, nil
 }
