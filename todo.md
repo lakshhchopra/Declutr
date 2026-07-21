@@ -50,6 +50,7 @@ This document tracks the comprehensive roadmap and action items to complete the 
 - [ ] Vault Management services on Go API:
   - Vault creation (`POST /v1/vaults`) and key wrapping handling (wrapping VK with MVK)
 - [ ] Client-Side AES-256-GCM encryption utilities for files (both Next.js and React Native)
+- [x] Content Ingestion & Upload Pipeline (`StorageProvider` abstraction, `005_create_assets_and_ingestion_tables.sql`, `UploadModal` drag & drop, SHA-256 WebCrypto checksums)
 - [ ] Direct S3/Cloudflare R2 Chunked Upload implementation:
   - Backend pre-signed URL generator API (`POST /v1/files/upload/initiate`)
   - Web & Mobile multipart chunked upload handlers with auto-resume support

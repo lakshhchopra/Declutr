@@ -41,6 +41,13 @@ Declutr is structured as a production-grade modular monorepo:
 
 ## 📜 Dev History (Commit Log Summary)
 
+- **Content Ingestion & Upload Pipeline (Issue #009)**:
+  - Created PostgreSQL database migration `database/migrations/005_create_assets_and_ingestion_tables.sql` (`assets` and `upload_jobs` tables with status indexes).
+  - Built storage provider abstraction layer `StorageProvider` (`backend/shared/storage/storage.go`) supporting S3, Cloudflare R2, and local file storage providers.
+  - Implemented `Asset` domain model (`backend/modules/file/domain/asset.go`) featuring extensible pipeline status states (`QUEUED` ➔ `UPLOADING` ➔ `UPLOADED` ➔ `VALIDATING` ➔ `METADATA_PENDING` ➔ `AI_PENDING` ➔ `INDEXED_PENDING` ➔ `READY` / `FAILED`).
+  - Added unit test suite `ingestion_test.go` covering status state transitions and job progress percentage logic.
+  - Built client upload service `UploadService` (`frontend/features/upload/services/upload-service.ts`) computing WebCrypto SHA-256 checksums and file size validations.
+  - Implemented interactive `UploadModal` (`frontend/features/upload/components/upload-modal.tsx`) supporting drag & drop, file browser, ingestion queue list, status badges, progress indicators, and cancellation.
 - **Vault Workspace Foundation (Issue #008)**:
   - Created PostgreSQL database migration `database/migrations/004_create_vaults_table.sql` (`vaults` and `vault_settings` tables with owner_id foreign keys).
   - Built backend `Vault` domain model (`backend/modules/vault/domain/vault.go`) and unit tests (`application/vault_test.go`).

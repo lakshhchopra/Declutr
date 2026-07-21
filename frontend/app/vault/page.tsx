@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { FolderKey, ShieldCheck, Database, HardDrive, Upload, Filter, Sparkles, Layers, RefreshCw } from "lucide-react";
+import { FolderKey, ShieldCheck, Database, HardDrive, Upload, Filter, RefreshCw, Layers } from "lucide-react";
 import { PageShell } from "../../shared/components/layout/page-shell";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../../shared/components/ui/card";
 import { Badge } from "../../shared/components/ui/badge";
@@ -10,9 +10,11 @@ import { SearchInput } from "../../shared/components/ui/input";
 import { Grid } from "../../shared/components/layout/layout-primitives";
 import { EmptyState } from "../../shared/components/feedback/empty-state";
 import { VaultService, VaultData } from "../../features/vault/services/vault-service";
+import { UploadModal } from "../../features/upload/components/upload-modal";
 
 export default function VaultPage() {
   const [vault, setVault] = useState<VaultData | null>(null);
+  const [uploadOpen, setUploadOpen] = useState(false);
 
   useEffect(() => {
     VaultService.getCurrentVault().then(setVault);
@@ -36,12 +38,20 @@ export default function VaultPage() {
           <Badge variant="emerald" className="px-3 py-1 text-xs">
             <ShieldCheck className="h-3.5 w-3.5 mr-1" /> AES-256 ENCRYPTED
           </Badge>
-          <Button variant="default" leftIcon={<Upload className="h-4 w-4" />}>
+          <Button variant="default" onClick={() => setUploadOpen(true)} leftIcon={<Upload className="h-4 w-4" />}>
             Upload Memory
           </Button>
         </div>
       }
     >
+      <UploadModal
+        open={uploadOpen}
+        onOpenChange={setUploadOpen}
+        onUploadComplete={() => {
+          VaultService.getCurrentVault().then(setVault);
+        }}
+      />
+
       {/* Search & Action Bar */}
       <div className="mb-6 flex flex-col sm:flex-row gap-3 items-center justify-between">
         <div className="w-full sm:max-w-md">
@@ -114,7 +124,7 @@ export default function VaultPage() {
         title="Your Vault Workspace is Ready"
         description="Start by uploading your first memory, document, receipt, or audio file. Your Master Vault Key will encrypt items before transmission."
         actionLabel="Upload First File"
-        onAction={() => alert("File upload pipeline will be connected in Phase 2.")}
+        onAction={() => setUploadOpen(true)}
       />
     </PageShell>
   );
