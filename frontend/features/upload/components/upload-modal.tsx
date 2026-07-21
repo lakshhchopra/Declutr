@@ -174,7 +174,7 @@ export function UploadModal({ open, onOpenChange, onUploadComplete }: UploadModa
                     </Badge>
                   )}
                   {item.status === "FAILED" && (
-                    <Badge variant="danger" className="flex items-center gap-1">
+                    <Badge variant="rose" className="flex items-center gap-1">
                       <AlertCircle className="h-3 w-3" /> {item.error || "FAILED"}
                     </Badge>
                   )}
