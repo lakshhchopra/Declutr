@@ -41,6 +41,14 @@ Declutr is structured as a production-grade modular monorepo:
 
 ## 📜 Dev History (Commit Log Summary)
 
+- **Metadata Extraction Engine (Issue #011)**:
+  - Created PostgreSQL database migration `database/migrations/007_create_metadata_tables.sql` (`asset_metadata`, `asset_properties`, `asset_exif`, `metadata_versions`).
+  - Implemented Domain models for `AssetMetadata`, `AssetProperties`, `AssetExif`, and `CompleteMetadata`.
+  - Built extensible `ExtractorRegistry` with `ImageExtractor`, `TextExtractor`, and `MockComplexExtractor` for PDFs/Video/Audio.
+  - Built `MetadataExtractionWorker` to integrate with the Processing Engine orchestration queue.
+  - Added REST API endpoints (`/api/v1/metadata/:assetId`, `/history`, `/refresh`).
+  - Created Web UI Metadata Panel (`frontend/features/metadata/components/metadata-panel.tsx`) with categorized factual metadata display.
+  - Created Mobile UI component `MetadataViewer.tsx` for tracking metadata on native devices.
 - **Content Processing Engine & Background Jobs (Issue #010)**:
   - Created PostgreSQL database migration `database/migrations/006_create_processing_tables.sql` (`processing_jobs`, `processing_workers`, `processing_events`, `processing_attempts`).
   - Implemented Domain models for `Job`, `Worker`, and lifecycle `Event`s with state machine statuses (Queued, Running, Failed, Retrying, etc.).

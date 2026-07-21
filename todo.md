@@ -61,10 +61,10 @@ This document tracks the comprehensive roadmap and action items to complete the 
 ## 🧠 Phase 3: Background Jobs & Ingestion Pipeline
 - [x] Set up Go background worker framework (Processing Engine, Queue interfaces, Scheduler)
 - [x] Ingestion job state machine monitoring (`QUEUED` ➔ `RUNNING` ➔ `COMPLETED`/`FAILED`)
-- [ ] Implement capability-driven Content Ingestion Pipeline:
-  - File Validation & mime-type magic-number checks
-  - Content parsing (plaintext extraction, PDF structures)
-  - OCR extraction service (Tesseract wrapper, local ONNX OCR model, or cloud API wrapper)
+- [x] Implement capability-driven Content Ingestion Pipeline:
+  - [x] File Validation & mime-type magic-number checks
+  - [x] Content parsing (plaintext extraction, PDF structures)
+  - [ ] OCR extraction service (Tesseract wrapper, local ONNX OCR model, or cloud API wrapper)
   - Audio transcription service (Whisper execution)
 
 ---
