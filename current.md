@@ -41,6 +41,15 @@ Declutr is structured as a production-grade modular monorepo:
 
 ## 📜 Dev History (Commit Log Summary)
 
+- **Entity Extraction & Knowledge Foundation (Issue #014)**:
+  - Created PostgreSQL database migration `database/migrations/010_create_entity_extraction_tables.sql` (`entity_types`, `entities`, `entity_aliases`, `entity_occurrences`).
+  - Implemented Domain models for `Entity`, `EntityType`, `EntityOccurrence`.
+  - Built `MockEntityExtractor` simulating NLP extraction of Organizations, Locations, Amounts, and Dates.
+  - Built Canonical Entity Resolution logic tying `OriginalValue` aliases to a single resolved `CanonicalName` securely within a `VaultID`.
+  - Built `EntityExtractionWorker` to integrate with the Processing Engine orchestration queue.
+  - Added REST API endpoints (`/api/v1/entities`, `/api/v1/entities/asset/:assetId`).
+  - Created Web UI Component (`frontend/features/entities/components/entity-panel.tsx`) featuring hover-inspectable Entity Chips grouped by type.
+  - Created Mobile UI Component (`EntityViewer.tsx`) for native display of entity cards.
 - **AI Analysis & Understanding Engine (Issue #013)**:
   - Created PostgreSQL database migration `database/migrations/009_create_ai_analysis_tables.sql` (`ai_analysis`, `ai_classification`, `ai_tags`, `ai_topics`, `analysis_versions`).
   - Implemented Domain models for `AIAnalysis`, `Classification`, `Tag`, `Topic`, and `AnalysisVersion`.

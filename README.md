@@ -235,3 +235,20 @@ For every document, the engine strictly generates:
 
 ### Prompt Strategy & Retry Loop
 The `PromptManager` compiles normalized blocks into a strict JSON-schema prompt. The engine features an exponential backoff retry loop and full token usage tracking per-request to manage LLM costs.
+
+---
+
+## 🏛️ Entity Extraction & Knowledge Foundation
+
+The Entity Extraction Engine converts the structured AI Analysis into atomic, semantic entities. These entities form the bedrock of the future Knowledge Graph, Relational Engine, and Context-Aware Search.
+
+### Supported Entity Types
+The system supports strongly-typed extraction across dozens of categories, including `Person`, `Organization`, `Location`, `Date`, `Amount`, `Product`, and various `Identifier`s (passports, VINs, accounts).
+
+### Canonical Entity Resolution
+Entities are deduplicated and resolved to a Canonical Name. For example, the terms *"NYC"*, *"New York"*, and *"New York City"* appearing across dozens of different files are all resolved to a single Canonical Entity (`New York City`).
+- The `entity_aliases` table tracks the mapping of historical aliases to the canonical ID.
+- The `entity_occurrences` table binds specific entity discoveries to the original `asset_id` and tracks the specific substring (`original_value`) found in the document, along with a `confidence_score`.
+
+### Security Boundaries
+Entities are strictly bound to the `vault_id`. Deduplication and canonical resolution happen *within* a user's vault, ensuring no cross-pollination of private knowledge graph data between users.

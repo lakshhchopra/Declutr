@@ -73,7 +73,7 @@ This document tracks the comprehensive roadmap and action items to complete the 
 - [x] AI Analysis & Understanding Engine (Provider Abstraction, Prompt Manager, Structured JSON Output)
 - [ ] Database Schema: Relational tables
   - Add tables for `relationships`
-- [ ] Entity Extraction: Parser targeting dates, locations, merchants, transaction values, and names
+- [x] Entity Extraction: Parser targeting dates, locations, merchants, transaction values, and names
 - [ ] Intent-Aware Organization Engine:
   - Probabilistic classification of files into Category vs. Intent vs. Context
   - Direct relationship modeling: `RELATED_TO`, `PART_OF`, `MENTIONS`, `SAME_EVENT`, `SAME_LOCATION`
