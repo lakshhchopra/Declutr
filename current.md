@@ -41,15 +41,14 @@ Declutr is structured as a production-grade modular monorepo:
 
 ## 📜 Dev History (Commit Log Summary)
 
-- **Monorepo Refactoring**:
-  - Restructured Go backend into domain-oriented modules (`modules/auth/domain`, `modules/auth/application`, `modules/auth/repository`, `modules/auth/transport`).
-  - Extracted shared cross-cutting packages (`shared/crypto`, `shared/database`, `shared/middleware`, `pkg/health`).
-  - Restructured Next.js web application and Expo mobile app to mirror feature architecture.
-  - Organized docs, database, infrastructure, scripts, security, and tests directories.
-- **Session Management**:
-  - Added session database models, schemas, and token generators.
-- **SRP (Secure Remote Password) Authentication**:
-  - Implemented verification proof interface and SRP engine foundation.
-  - Implemented single-use SRP challenges and expiration validations.
-- **Registration Flow**:
-  - Email hashing utility before persistence.
+- **Application Shell & Navigation Foundation (Issue #002)**:
+  - Built responsive multi-device application shell (`AppShell`) with Desktop Sidebar, Top Navigation, Tablet Collapsible Sidebar, and Mobile Bottom Navigation bar.
+  - Configured global application providers in `frontend/shared/providers/`: `ThemeProvider`, `QueryProvider` (TanStack Query), `ToastProvider`, `ModalProvider`, `SessionProvider`, and composite `AppProviders`.
+  - Built reusable `PageShell` page template component with breadcrumbs, title, subtitle, and actions header.
+  - Implemented application route structure with clean placeholder pages (`/dashboard`, `/vault`, `/search`, `/collections`, `/ai`, `/persona`, `/security`, `/settings`).
+  - Added loading framework skeleton (`loading.tsx`), custom 404 page (`not-found.tsx`), and error boundary fallback (`error.tsx`).
+- **Shared Design System Foundation (Issue #001)**:
+  - Established centralized theme system (`ThemeProvider`) supporting Dark Mode (default), Light Mode, System Theme detection, and persistent `localStorage` preference.
+  - Implemented semantic CSS design tokens in `globals.css`.
+  - Built reusable `shadcn/ui` & Radix UI component primitives.
+
