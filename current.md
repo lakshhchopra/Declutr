@@ -41,15 +41,16 @@ Declutr is structured as a production-grade modular monorepo:
 
 ## 📜 Dev History (Commit Log Summary)
 
-- **Monorepo Refactoring**:
-  - Restructured Go backend into domain-oriented modules (`modules/auth/domain`, `modules/auth/application`, `modules/auth/repository`, `modules/auth/transport`).
-  - Extracted shared cross-cutting packages (`shared/crypto`, `shared/database`, `shared/middleware`, `pkg/health`).
-  - Restructured Next.js web application and Expo mobile app to mirror feature architecture.
-  - Organized docs, database, infrastructure, scripts, security, and tests directories.
-- **Session Management**:
-  - Added session database models, schemas, and token generators.
-- **SRP (Secure Remote Password) Authentication**:
-  - Implemented verification proof interface and SRP engine foundation.
-  - Implemented single-use SRP challenges and expiration validations.
-- **Registration Flow**:
-  - Email hashing utility before persistence.
+- **Shared Design System Foundation (Issue #001)**:
+  - Established centralized theme system (`ThemeProvider`) supporting Dark Mode (default), Light Mode, System Theme detection, and persistent `localStorage` preference.
+  - Implemented semantic CSS design tokens in `globals.css` (Background, Surface, Card, Border, Primary, Secondary, Accent, Success, Warning, Danger, Info, Text tokens).
+  - Built reusable `shadcn/ui` & Radix UI component primitives under `frontend/shared/components/`:
+    - Buttons (Primary, Secondary, Ghost, Danger, Outline, Icon, Loading)
+    - Inputs (TextInput, PasswordInput, SearchInput, Textarea)
+    - Cards & Badges (Card, CardHeader, CardContent, Badge variants)
+    - Feedback (Alerts, Spinner, Skeleton, EmptyState, ErrorState)
+    - Overlay (Dialog / Modal)
+    - Navigation (SidebarShell, TopNavigation, Breadcrumb, Tabs)
+    - Layout (Container, Grid, Stack, Section)
+  - Created interactive Design System Showcase page at `/design-system`.
+

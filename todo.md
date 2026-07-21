@@ -11,6 +11,7 @@ This document tracks the comprehensive roadmap and action items to complete the 
 - [x] Refactor repository into a domain-oriented modular monorepo (`modules/`, `shared/`, `platform/`, `features/`, `docs/`, `infrastructure/`, `scripts/`, `tests/`, `security/`)
 - [x] Initialize PostgreSQL database connection wrapper
 - [x] Setup health check endpoints and routing configurations
+- [x] Build Shared Design System Foundation (`shadcn/ui`, Radix UI, Dark Mode default, Theme tokens)
 - [ ] Set up Docker Compose for local development (Go API + PostgreSQL + pgvector + Redis)
 - [ ] Establish CI/CD structures (GitHub Actions, linting, testing checks)
 
