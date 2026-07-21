@@ -26,9 +26,10 @@ This document tracks the comprehensive roadmap and action items to complete the 
 - [x] Add SRP proof verification interface & engine foundation
 - [x] Add session model and database table
 - [x] Create session token generator (JWT-like or secure random byte tokens)
-- [ ] Complete SRP-6a Authentication flow endpoints on Go API:
-  - `POST /v1/auth/srp/initiate`
-  - `POST /v1/auth/srp/verify`
+- [x] Complete SRP-6a Authentication flow endpoints on Go API:
+  - `POST /api/v1/auth/register`
+  - `POST /api/v1/auth/login/start`
+  - `POST /api/v1/auth/login/finish`
 - [ ] Implement JWT Session rotation and Refresh token flow
 - [ ] Web Client Integration (Next.js):
   - Integrate client-side SRP calculation (WASM-compiled `libsodium` or WebCrypto)

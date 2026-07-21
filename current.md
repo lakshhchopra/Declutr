@@ -41,6 +41,13 @@ Declutr is structured as a production-grade modular monorepo:
 
 ## 📜 Dev History (Commit Log Summary)
 
+- **SRP Authentication Backend Foundation (Issue #004)**:
+  - Implemented production-ready zero-knowledge SRP-6a authentication backend architecture in `backend/modules/auth/`:
+    - Domain: User credentials model, SRP challenge entity, session types.
+    - Application: `Service`, `LoginStart`, `LoginFinish`, `Engine` math, and `ChallengeStore` single-use challenge expiration validator.
+    - Repository: `UserRepository` interface and PostgreSQL `PostgresUserRepository` queries.
+    - Transport & Endpoints: `POST /api/v1/auth/register`, `POST /api/v1/auth/login/start`, `POST /api/v1/auth/login/finish`.
+  - Added unit test suite in `modules/auth/application/engine_test.go` and `store_test.go`.
 - **Authentication UI & Onboarding Experience (Issue #003)**:
   - Created complete authentication user interface for Web and Mobile following zero-trust design guidelines.
   - Implemented client-side Zod validation schemas (`loginSchema`, `registerSchema`, `forgotPasswordSchema`, `resetPasswordSchema`) integrated with React Hook Form.
