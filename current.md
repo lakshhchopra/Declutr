@@ -41,6 +41,12 @@ Declutr is structured as a production-grade modular monorepo:
 
 ## 📜 Dev History (Commit Log Summary)
 
+- **User Onboarding, Profile & Preferences (Issue #007)**:
+  - Created PostgreSQL database migration `database/migrations/003_create_user_profiles_and_preferences.sql` (`user_profiles` and `user_preferences` tables).
+  - Implemented client-side Zod validation schemas (`profileSchema`, `preferencesSchema`) in `frontend/features/user/schemas/profile-schema.ts`.
+  - Built `ProfileService` (`frontend/features/user/services/profile-service.ts`) managing `getProfile`, `updateProfile`, `getPreferences`, `updatePreferences`, and `completeOnboarding`.
+  - Built interactive 8-step Onboarding flow page (`/onboarding`): Welcome, Display Name, Avatar Accent, Theme Mode, AI Behavior, Privacy Architecture Mode, Notifications, and Setup Completion.
+  - Enhanced Settings page (`/settings`) with tabbed sections for General & Profile, Appearance, AI Behavior, Privacy Mode, and Notifications.
 - **Session Management & Authentication Persistence (Issue #006)**:
   - Created PostgreSQL database migration `database/migrations/002_create_sessions_table.sql` (`user_sessions` table with indexes on `user_id`, `refresh_token_hash`, and `expires_at`).
   - Implemented session domain entity `UserSession` (`backend/modules/auth/domain/session.go`) with `IsActive()` expiration and revocation checkers.

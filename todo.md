@@ -37,6 +37,7 @@ This document tracks the comprehensive roadmap and action items to complete the 
 - [ ] Mobile Client Integration (Expo / React Native):
   - Integrate native cryptographic library for SRP calculations
   - Implement secure local storage (e.g. `expo-secure-store`) for session tokens and key wrapping
+- [x] Implement User Onboarding, Profile & Preferences (Interactive 8-step `/onboarding`, tabbed `/settings`, `ProfileService`, `003_create_user_profiles_and_preferences.sql`)
 - [ ] Integrate WebAuthn / Passkey setup and validation flow (both Web and Native Mobile)
 
 ---
