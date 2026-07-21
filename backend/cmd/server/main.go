@@ -4,12 +4,12 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/diablovocado/declutr/internal/auth"
-	"github.com/diablovocado/declutr/internal/auth/srp"
-	"github.com/diablovocado/declutr/internal/database"
-	"github.com/diablovocado/declutr/internal/health"
-	"github.com/diablovocado/declutr/internal/middleware"
-	"github.com/diablovocado/declutr/internal/repository"
+	"github.com/diablovocado/declutr/modules/auth/application"
+	"github.com/diablovocado/declutr/modules/auth/repository"
+	"github.com/diablovocado/declutr/modules/auth/transport"
+	"github.com/diablovocado/declutr/pkg/health"
+	"github.com/diablovocado/declutr/shared/database"
+	"github.com/diablovocado/declutr/shared/middleware"
 )
 
 func main() {
@@ -19,31 +19,31 @@ func main() {
 		DB: db,
 	}
 
-	authService := &auth.Service{
+	authService := &application.Service{
 		UserRepo:   userRepo,
-		Challenges: srp.NewChallengeStore(),
-		SRP:        srp.NewEngine(),
+		Challenges: application.NewChallengeStore(),
+		SRP:        application.NewEngine(),
 	}
 
 	http.HandleFunc("/health", health.Handler)
 
 	http.HandleFunc(
 		"/api/v1/auth/register",
-		auth.RegisterHandler(authService),
+		transport.RegisterHandler(authService),
 	)
 
 	http.HandleFunc(
 		"/api/v1/auth/login/start",
-		auth.LoginStartHandler(authService),
+		transport.LoginStartHandler(authService),
 	)
 	http.Handle(
 		"/api/v1/me",
-		middleware.Auth(userRepo)(auth.MeHandler()),
+		middleware.Auth(userRepo)(transport.MeHandler()),
 	)
 
 	http.HandleFunc(
 		"/api/v1/auth/login/finish",
-		auth.LoginFinishHandler(authService),
+		transport.LoginFinishHandler(authService),
 	)
 
 	log.Println("Declutr Backend Running on :8080")
