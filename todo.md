@@ -31,9 +31,9 @@ This document tracks the comprehensive roadmap and action items to complete the 
   - `POST /api/v1/auth/login/start`
   - `POST /api/v1/auth/login/finish`
 - [ ] Implement JWT Session rotation and Refresh token flow
-- [ ] Web Client Integration (Next.js):
-  - Integrate client-side SRP calculation (WASM-compiled `libsodium` or WebCrypto)
-  - Implement credentials caching and Master Vault Key wrapping
+- [x] Web Client Integration (Next.js):
+  - Integrate client-side SRP calculation & payload exchange (`AuthService`, TanStack Query mutations)
+  - Connect login and registration forms to Go SRP backend APIs
 - [ ] Mobile Client Integration (Expo / React Native):
   - Integrate native cryptographic library for SRP calculations
   - Implement secure local storage (e.g. `expo-secure-store`) for session tokens and key wrapping

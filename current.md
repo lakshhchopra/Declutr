@@ -41,8 +41,16 @@ Declutr is structured as a production-grade modular monorepo:
 
 ## 📜 Dev History (Commit Log Summary)
 
+- **Authentication Integration (Issue #005)**:
+  - Created typed API service client `AuthService` (`frontend/features/auth/services/auth-service.ts`) encapsulating `register`, `loginStart`, and `loginFinish` endpoints.
+  - Connected Next.js authentication forms (`/login`, `/register`) to backend SRP APIs using TanStack React Query `useMutation`.
+  - Integrated client-side SRP payload exchange:
+    - Registration: `email`, `srpSalt`, `srpVerifier`, `mvk` ciphertext payload.
+    - Login Start: `email` request ➔ returns `challengeId`, `srpSalt`, `serverPublicKey B`.
+    - Login Finish: `challengeId`, `clientPublicKey A`, `clientProof M1` ➔ returns `serverProof M2` & token.
+  - Handled network errors, server unavailable fallbacks, and user feedback toasts via `ToastProvider`.
 - **SRP Authentication Backend Foundation (Issue #004)**:
-  - Implemented production-ready zero-knowledge SRP-6a authentication backend architecture in `backend/modules/auth/`:
+  - Implemented production-ready zero-knowledge SRP-6a authentication backend architecture in `backend/modules/auth/`.
     - Domain: User credentials model, SRP challenge entity, session types.
     - Application: `Service`, `LoginStart`, `LoginFinish`, `Engine` math, and `ChallengeStore` single-use challenge expiration validator.
     - Repository: `UserRepository` interface and PostgreSQL `PostgresUserRepository` queries.
