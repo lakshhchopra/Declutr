@@ -41,16 +41,14 @@ Declutr is structured as a production-grade modular monorepo:
 
 ## 📜 Dev History (Commit Log Summary)
 
+- **Application Shell & Navigation Foundation (Issue #002)**:
+  - Built responsive multi-device application shell (`AppShell`) with Desktop Sidebar, Top Navigation, Tablet Collapsible Sidebar, and Mobile Bottom Navigation bar.
+  - Configured global application providers in `frontend/shared/providers/`: `ThemeProvider`, `QueryProvider` (TanStack Query), `ToastProvider`, `ModalProvider`, `SessionProvider`, and composite `AppProviders`.
+  - Built reusable `PageShell` page template component with breadcrumbs, title, subtitle, and actions header.
+  - Implemented application route structure with clean placeholder pages (`/dashboard`, `/vault`, `/search`, `/collections`, `/ai`, `/persona`, `/security`, `/settings`).
+  - Added loading framework skeleton (`loading.tsx`), custom 404 page (`not-found.tsx`), and error boundary fallback (`error.tsx`).
 - **Shared Design System Foundation (Issue #001)**:
   - Established centralized theme system (`ThemeProvider`) supporting Dark Mode (default), Light Mode, System Theme detection, and persistent `localStorage` preference.
-  - Implemented semantic CSS design tokens in `globals.css` (Background, Surface, Card, Border, Primary, Secondary, Accent, Success, Warning, Danger, Info, Text tokens).
-  - Built reusable `shadcn/ui` & Radix UI component primitives under `frontend/shared/components/`:
-    - Buttons (Primary, Secondary, Ghost, Danger, Outline, Icon, Loading)
-    - Inputs (TextInput, PasswordInput, SearchInput, Textarea)
-    - Cards & Badges (Card, CardHeader, CardContent, Badge variants)
-    - Feedback (Alerts, Spinner, Skeleton, EmptyState, ErrorState)
-    - Overlay (Dialog / Modal)
-    - Navigation (SidebarShell, TopNavigation, Breadcrumb, Tabs)
-    - Layout (Container, Grid, Stack, Section)
-  - Created interactive Design System Showcase page at `/design-system`.
+  - Implemented semantic CSS design tokens in `globals.css`.
+  - Built reusable `shadcn/ui` & Radix UI component primitives.
 
