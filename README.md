@@ -218,3 +218,20 @@ Regardless of the original file format, Declutr translates the content into a no
 - **Attributes**: Language, Word/Char counts, Estimated Reading Time.
 
 This ensures all downstream AI embeddings and search indices consume the exact same structured interface without needing to understand the original file's binary layout.
+
+---
+
+## 🧠 AI Analysis & Understanding Engine
+
+The AI Understanding Engine takes the normalized text from the Extraction Engine and generates structured semantic analysis. It is designed to be fully LLM-agnostic through a **Provider Abstraction** layer (`MockProvider`, `OpenAIProvider`, `AnthropicProvider`, etc.).
+
+### Structured Output
+For every document, the engine strictly generates:
+- **Summaries**: Short summary, detailed summary, and document purpose.
+- **Classification**: Document category (e.g., Receipt, Invoice), document type, and quality markers (scanned, incomplete, corrupted).
+- **Metadata**: Sentiment, complexity, reading level, language, and writing style.
+- **Tags & Topics**: Deduplicated arrays of semantic tags and topics.
+- **Confidence Scores**: Every generated field is backed by an AI confidence score (0.0 - 1.0) for UI transparency.
+
+### Prompt Strategy & Retry Loop
+The `PromptManager` compiles normalized blocks into a strict JSON-schema prompt. The engine features an exponential backoff retry loop and full token usage tracking per-request to manage LLM costs.
