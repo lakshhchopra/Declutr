@@ -1389,6 +1389,50 @@ User Goal → Coordinator Agent → Task Planner → Specialist Agents → Share
 | `GET` | `/api/v1/multiagent/tasks` | Get task graph execution status |
 | `GET` | `/api/v1/multiagent/health` | Get specialist agent health metrics |
 
+---
+
+## 🔮 Predictive Intelligence & Life Intelligence Engine
+
+Declutr's Predictive Engine proactively anticipates user needs ("I remembered this for you" instead of "What do you want to search?").
+
+### Pipeline & Architecture
+
+```
+Knowledge Graph → Memory Engine → Timeline → Reverse Persona → Predictive Engine → Recommendation Planner → Approval → Action
+```
+
+### Key Capabilities
+
+- **16 Prediction Categories**: `UPCOMING_DEADLINE`, `EXPIRING_DOCUMENT`, `UPCOMING_TRIP`, `UPCOMING_MEETING`, `MISSING_DOCUMENT`, `SUGGESTED_UPLOAD`, `SUGGESTED_ORGANIZATION`, `SUGGESTED_ARCHIVE`, `SUGGESTED_DELETION`, `SUGGESTED_WORKFLOW`, `SUGGESTED_COLLECTION`, `SUGGESTED_SUMMARY`, `RECURRING_TASK`, `RECURRING_EXPENSE`, `KNOWLEDGE_GAP`, `OPPORTUNITY_DETECTION`.
+- **Pattern Analysis Engine**: `PredictiveEngine` (`backend/modules/predictive/application/engine.go`) synthesizes Knowledge Graph, Memory Engine, Timeline, and Reverse Persona signals to detect proactive patterns.
+- **Recommendation Planner**: `RecommendationPlanner` (`backend/modules/predictive/application/planner.go`) filters predictions against user confidence thresholds (e.g. min 0.80) and enabled categories.
+- **Feedback & Tuning**: `PredictiveService` (`backend/modules/predictive/application/service.go`) tracks acceptance/dismissal feedback to continuously improve prediction accuracy.
+- **100% Vault-Confined Privacy**: All pattern data stays strictly within the user's isolated Vault. Suggested actions never execute automatically without explicit user approval.
+- **Web & Mobile Portals**: `/predictive` (Life Intelligence Feed, Upcoming Items Timeline, Opportunity Detector, Settings), and React Native mobile components.
+
+### Database Schema (Migration 033)
+
+| Table | Purpose |
+|---|---|
+| `predictions` | Proactive predictions, confidence scores, and priority ratings |
+| `prediction_history` | Historical audit logs of user interactions with predictions |
+| `prediction_feedback` | User acceptance/dismissal feedback comments for model tuning |
+| `prediction_models` | Machine learning model versioning and accuracy scores |
+| `prediction_scores` | Observability telemetry metrics (acceptance rates, accuracy scores) |
+
+### REST API
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/v1/predictive/predictions` | Retrieve proactive life intelligence predictions |
+| `POST` | `/api/v1/predictive/accept` | Accept suggested prediction action |
+| `POST` | `/api/v1/predictive/dismiss` | Dismiss prediction with feedback |
+| `GET` | `/api/v1/predictive/history` | Retrieve prediction history audit log |
+| `GET` | `/api/v1/predictive/settings` | Get user prediction category settings and confidence threshold |
+| `PUT` | `/api/v1/predictive/settings` | Update user prediction settings |
+| `GET` | `/api/v1/predictive/stats` | Retrieve prediction telemetry stats (accuracy, acceptance rate) |
+
+
 
 
 

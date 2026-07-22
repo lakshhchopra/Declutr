@@ -55,6 +55,9 @@ import (
 	personaApp "github.com/diablovocado/declutr/modules/persona/application"
 	personaRepository "github.com/diablovocado/declutr/modules/persona/repository"
 	personaTransport "github.com/diablovocado/declutr/modules/persona/transport"
+	predictiveApp "github.com/diablovocado/declutr/modules/predictive/application"
+	predictiveRepository "github.com/diablovocado/declutr/modules/predictive/repository"
+	predictiveTransport "github.com/diablovocado/declutr/modules/predictive/transport"
 	searchApp "github.com/diablovocado/declutr/modules/search/application"
 	searchRepository "github.com/diablovocado/declutr/modules/search/repository"
 	searchTransport "github.com/diablovocado/declutr/modules/search/transport"
@@ -82,7 +85,7 @@ import (
 func main() {
 	cfg := config.LoadConfig()
 	logger := observability.InitLogger("declutr-backend", nil)
-	logger.Info(context.Background(), "Starting Declutr Multi-Agent Intelligence Engine", map[string]interface{}{
+	logger.Info(context.Background(), "Starting Declutr Predictive Life Intelligence Server", map[string]interface{}{
 		"env":  cfg.Env,
 		"port": cfg.Port,
 	})
@@ -100,6 +103,18 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
+
+	// Predictive Intelligence & Life Intelligence Engine Initialization
+	predRepo := predictiveRepository.NewInMemoryPredictiveRepository()
+	predSvc := predictiveApp.NewPredictiveService(predRepo)
+	predAPI := predictiveTransport.NewPredictiveAPI(predSvc)
+
+	mux.HandleFunc("/api/v1/predictive/predictions", predAPI.GetPredictions)
+	mux.HandleFunc("/api/v1/predictive/accept", predAPI.AcceptPrediction)
+	mux.HandleFunc("/api/v1/predictive/dismiss", predAPI.DismissPrediction)
+	mux.HandleFunc("/api/v1/predictive/history", predAPI.GetHistory)
+	mux.HandleFunc("/api/v1/predictive/settings", predAPI.ManageSettings)
+	mux.HandleFunc("/api/v1/predictive/stats", predAPI.GetStats)
 
 	// Multi-Agent Intelligence Platform Initialization
 	multiRepo := multiagentRepository.NewInMemoryMultiAgentRepository()
@@ -623,7 +638,7 @@ func main() {
 		IdleTimeout:  60 * time.Second,
 	}
 
-	log.Printf("Declutr Multi-Agent Intelligence Platform Running on :%s (Environment: %s)", cfg.Port, cfg.Env)
+	log.Printf("Declutr Predictive Life Intelligence Engine Running on :%s (Environment: %s)", cfg.Port, cfg.Env)
 
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("Server startup failed: %v", err)
