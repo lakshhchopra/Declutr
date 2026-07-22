@@ -942,6 +942,47 @@ Declutr's Backup & Disaster Recovery System protects the entire Vault from catas
 | `POST` | `/api/v1/backups/cancel` | Cancel active backup or restore job |
 | `GET` | `/api/v1/backups/stats` | Vault backup & disaster recovery stats |
 
+---
+
+## 🛡️ Security Center, Audit Hub & Trust Platform
+
+Declutr's Security Center ("Trust Center") provides a centralized hub for monitoring security posture scores, analyzing risk signals, managing active sessions and trusted device registries, and reviewing comprehensive vault audit event streams.
+
+> **Architecture**: `Domain Events` → `Security Event Collector` → `Risk Engine` → `Audit Engine` → `Security Center`
+
+### Core Trust Features
+
+- **Security Posture Score**: Dynamic 0-100 numerical score and letter grade (`A`, `B`, `C`, `D`, `F`) assessing encryption, MFA, session hygiene, and backup health.
+- **Risk Engine**: Real-time signal evaluator identifying new device logins, mass file operations, repeated failed logins, and suspicious workflow execution.
+- **Session & Device Registry**: Session termination triggers (`Terminate Session`, `Terminate All Other Sessions`) and device trust status management (`Trust Device`, `Revoke Trust`).
+- **Audit Log Hub**: Asynchronous audit logging across 9 categories (`AUTH`, `ASSET`, `SHARING`, `WORKFLOW`, `AI`, `SEARCH`, `BACKUP`, `VERSIONING`, `SETTINGS`).
+
+### Database Schema (Migration 024)
+
+| Table | Purpose |
+|---|---|
+| `security_events` | Raw security event logs, severities (`LOW`, `MEDIUM`, `HIGH`, `CRITICAL`), actor IPs |
+| `security_scores` | Aggregated security posture score snapshots and letter grades |
+| `device_registry` | Registered user devices, OS, browser, IP address, and location |
+| `trusted_devices` | Device trust whitelist logs |
+| `audit_events` | Comprehensive vault audit log stream |
+| `risk_assessments` | Risk engine scoring assessments and contributing risk signals |
+| `security_recommendations` | Actionable security posture recommendations |
+
+### REST API
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/v1/security/dashboard` | Get complete security dashboard payload |
+| `GET` | `/api/v1/security/audit` | List filterable audit log events by category |
+| `GET` | `/api/v1/security/sessions` | List active user sessions |
+| `POST` | `/api/v1/security/sessions/terminate` | Terminate specific or all other sessions |
+| `GET` | `/api/v1/security/devices` | List registered user devices |
+| `POST` | `/api/v1/security/devices/trust` | Toggle device trust status |
+| `GET` | `/api/v1/security/risk` | Get latest risk assessment and signals |
+| `GET` | `/api/v1/security/recommendations` | List active security posture recommendations |
+
+
 
 
 

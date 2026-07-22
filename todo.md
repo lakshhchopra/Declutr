@@ -174,6 +174,16 @@ This document tracks the comprehensive roadmap and action items to complete the 
   - 8 REST API endpoints (backups, detail, schedule, restore, verify, cancel, stats)
   - Web UI: BackupDashboard, RestoreWizard, BackupHistory, `/backup` page route
   - Mobile UI: BackupStatus, RestoreHistory, ManualBackup
+- [x] Security Center, Audit Hub & Trust Platform:
+  - Database migration `024_create_security_tables.sql` (7 tables: security_events, security_scores, device_registry, trusted_devices, audit_events, risk_assessments, security_recommendations)
+  - Security Posture Score (0-100 & Letter Grades A-F)
+  - Risk Engine evaluating risk signals (new devices, failed logins, mass operations) to compute risk levels (LOW, MEDIUM, HIGH, CRITICAL)
+  - Asynchronous Audit Engine logging events across 9 categories (AUTH, ASSET, SHARING, WORKFLOW, AI, SEARCH, BACKUP, VERSIONING, SETTINGS)
+  - Session & Device Manager with session termination triggers & device trust toggles
+  - Actionable Security Posture Recommendations
+  - 8 REST API endpoints (dashboard, audit, sessions, terminate, devices, trust, risk, recommendations)
+  - Web UI: SecurityDashboardComponent, AuditViewerComponent, SessionDeviceManagerComponent, `/security` page route
+  - Mobile UI: SecurityOverview, SessionList, AuditSummary
   - 6/6 Go tests passing
 - [x] Reverse Persona Engine:
   - [x] Collect user interaction signals (ASSET_OPEN, SEARCH, PIN, UPLOAD, EDIT, CONTEXT_SWITCH, RELATIONSHIP_EXPLORE, COLLECTION_USE, TIME_OF_DAY, SEARCH_REFINEMENT, DASHBOARD_USAGE, FAVOURITE)

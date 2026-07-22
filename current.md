@@ -41,6 +41,16 @@ Declutr is structured as a production-grade modular monorepo:
 
 ## 📜 Dev History (Commit Log Summary)
 
+- **Security Center, Audit Hub & Trust Platform (Issue #028)**:
+  - Created PostgreSQL database migration `database/migrations/024_create_security_tables.sql` (`security_events`, `security_scores`, `device_registry`, `trusted_devices`, `audit_events`, `risk_assessments`, `security_recommendations`).
+  - Implemented domain models for `SecurityDashboard`, `SecurityScore`, `Device`, `ActiveSession`, `AuditEvent`, `RiskAssessment`, `SecurityRecommendation`, `TerminateSessionRequest`, `TrustDeviceRequest`.
+  - Built `RiskEngine` analyzing security signals (new devices, failed logins, mass downloads, permission changes) to compute dynamic risk scores (0-100) and risk levels (`LOW`, `MEDIUM`, `HIGH`, `CRITICAL`).
+  - Built `AuditEngine` & `SecurityCenterService` managing asynchronous audit logging across 9 categories (`AUTH`, `ASSET`, `SHARING`, `WORKFLOW`, `AI`, `SEARCH`, `BACKUP`, `VERSIONING`, `SETTINGS`), session termination, device trust toggling, and security posture score calculation (Grade A-F).
+  - Added 8 REST API endpoints (`GET /security/dashboard`, `GET /security/audit`, `GET /security/sessions`, `POST /security/sessions/terminate`, `GET /security/devices`, `POST /security/devices/trust`, `GET /security/risk`, `GET /security/recommendations`).
+  - Created Web UI module (`frontend/features/security/components/`) featuring `SecurityDashboardComponent`, `AuditViewerComponent`, `SessionDeviceManagerComponent`, and Next.js page route (`/security`).
+  - Created Mobile UI components (`frontend/declutr-mobile/features/security/components/`): `SecurityOverview.tsx`, `SessionList.tsx`, `AuditSummary.tsx`.
+  - Added comprehensive Go test suite (`security_test.go`) — 6/6 tests passing: Security Dashboard, Audit Logging, Session Termination, Device Trust Toggle, Risk Engine Scoring, Security Recommendations.
+
 - **Backup, Disaster Recovery & Business Continuity (Issue #027)**:
   - Created PostgreSQL database migration `database/migrations/023_create_backup_tables.sql` (`backups`, `backup_jobs`, `backup_files`, `backup_manifests`, `backup_history`, `restore_jobs`, `restore_history`).
   - Implemented domain models for `Backup`, `BackupJob`, `BackupManifest`, `BackupSchedule`, `RestoreJob`, `BackupStats`, `CreateBackupRequest`, `ScheduleBackupRequest`, `RestoreBackupRequest`, `VerifyBackupRequest`.

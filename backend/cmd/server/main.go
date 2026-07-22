@@ -37,6 +37,9 @@ import (
 	searchApp "github.com/diablovocado/declutr/modules/search/application"
 	searchRepository "github.com/diablovocado/declutr/modules/search/repository"
 	searchTransport "github.com/diablovocado/declutr/modules/search/transport"
+	securityApp "github.com/diablovocado/declutr/modules/security/application"
+	securityRepository "github.com/diablovocado/declutr/modules/security/repository"
+	securityTransport "github.com/diablovocado/declutr/modules/security/transport"
 	versioningApp "github.com/diablovocado/declutr/modules/versioning/application"
 	versioningRepository "github.com/diablovocado/declutr/modules/versioning/repository"
 	versioningTransport "github.com/diablovocado/declutr/modules/versioning/transport"
@@ -368,6 +371,23 @@ func main() {
 	http.HandleFunc("/api/v1/backups/verify", backupAPI.VerifyIntegrity)
 	http.HandleFunc("/api/v1/backups/cancel", backupAPI.CancelJob)
 	http.HandleFunc("/api/v1/backups/stats", backupAPI.GetStats)
+
+	// Security Center, Audit Hub & Trust Platform Module initialization
+	// Pipeline: Domain Events → Security Event Collector → Risk Engine → Audit Engine → Security Center
+	securityRepo := securityRepository.NewInMemorySecurityRepository()
+	securitySvc := securityApp.NewSecurityCenterService(securityRepo)
+	riskEngine := securityApp.NewRiskEngine(securitySvc)
+	_ = riskEngine // available for event-based risk evaluation
+	securityAPI := securityTransport.NewSecurityAPI(securitySvc)
+
+	http.HandleFunc("/api/v1/security/dashboard", securityAPI.GetDashboard)
+	http.HandleFunc("/api/v1/security/audit", securityAPI.ListAuditEvents)
+	http.HandleFunc("/api/v1/security/sessions", securityAPI.ListSessions)
+	http.HandleFunc("/api/v1/security/sessions/terminate", securityAPI.TerminateSession)
+	http.HandleFunc("/api/v1/security/devices", securityAPI.ListDevices)
+	http.HandleFunc("/api/v1/security/devices/trust", securityAPI.SetDeviceTrust)
+	http.HandleFunc("/api/v1/security/risk", securityAPI.GetRiskAssessment)
+	http.HandleFunc("/api/v1/security/recommendations", securityAPI.GetRecommendations)
 
 	log.Println("Declutr Backend Running on :8080")
 
