@@ -550,4 +550,75 @@ Avoids naive fixed-character splits by providing 5 strategy implementations:
 | `PUT` | `/api/v1/embedding/provider` | Update provider configuration for vault |
 | `POST` | `/api/v1/embedding/rebuild` | Upgrade model version and re-embed vault items |
 
+---
+
+## 🔍 Hybrid Knowledge Search Engine
+
+Declutr's Hybrid Knowledge Search Engine is the unified retrieval layer of the platform. Rather than relying on simple keyword or semantic search alone, it dynamically combines 7 parallel retrieval strategies to find relevant knowledge regardless of how the user expresses their intent.
+
+> **Retrieval Pipeline**: `User Query` → `Query Parser` → `Search Planner` → (`Keyword Search`, `Metadata Search`, `Entity Search`, `Relationship Search`, `Context Search`, `Memory Search`, `Vector Search`) → `Result Fusion` → `Ranking Engine` → `Search Results`
+
+### Multi-Strategy Retrieval & Weighted Score Fusion
+
+The engine evaluates candidates across 7 dimensions and combines them using weighted fusion:
+
+$$\text{FinalScore} = w_{\text{kw}} S_{\text{kw}} + w_{\text{vec}} S_{\text{vec}} + w_{\text{ent}} S_{\text{ent}} + w_{\text{ctx}} S_{\text{ctx}} + w_{\text{rel}} S_{\text{rel}} + w_{\text{mem}} S_{\text{mem}} + w_{\text{rec}} S_{\text{rec}}$$
+
+- **Keyword Search**: Full Text Search with prefix and quoted exact matching
+- **Vector Search**: Dense vector semantic similarity via the Embedding Engine
+- **Entity Search**: Canonical entity and alias matching (`Tokyo`, `PyTorch`, `Dr. Sharma`)
+- **Context Search**: Intent & activity matching (`Travel`, `Research`, `Medical`)
+- **Relationship Search**: Knowledge graph edge matching
+- **Memory Search**: Long-term persistent knowledge & strength scoring
+- **Recency Decay**: Exponential recency decay scoring
+
+### Query Understanding & Parsing
+
+Automatically detects query intent and structured constraints:
+- Quoted exact terms (`"passport photo"`)
+- Excluded terms (`-draft`)
+- File types (`pdf`, `docx`, `png`, `mp4`)
+- Year-based and relative date ranges (`2025`)
+- Entity and location detection (`Tokyo`, `Japan`, `PyTorch`, `Cardiology`)
+
+### Complete Match Explainability
+
+Every search result explains **why** it matched:
+
+```json
+{
+  "assetId": "asset-passport-001",
+  "score": 0.94,
+  "whyMatched": "Matched via exact keyword match in title & matched entity (Tokyo, Japan, Passport) & high semantic similarity.",
+  "contributingStrategies": ["KEYWORD", "VECTOR", "ENTITY", "CONTEXT", "MEMORY"],
+  "matchedEntities": ["Tokyo", "Japan", "Passport"],
+  "matchedContexts": ["Japan Vacation"],
+  "relatedMemories": ["Japan Vacation 2025"]
+}
+```
+
+### Database Schema (Migration 016)
+
+| Table | Purpose |
+|---|---|
+| `search_history` | Audit log of user search queries, latency, and result counts |
+| `saved_searches` | Bookmarked search queries with custom filters & pin status |
+| `search_statistics` | Vault-level search analytics, top queries, and strategy usage |
+| `search_preferences` | Per-vault ranking weights and default search options |
+| `search_index_versions` | Index synchronization and version tracking |
+
+### REST API
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/v1/search/query` | Execute multi-strategy hybrid search query |
+| `POST` | `/api/v1/search/saved` | Save / bookmark a search query with filters |
+| `GET` | `/api/v1/search/saved` | List saved searches for a vault |
+| `DELETE` | `/api/v1/search/saved` | Delete a saved search query |
+| `GET` | `/api/v1/search/history` | Get recent query execution history |
+| `GET` | `/api/v1/search/suggestions` | Search-as-you-type autocomplete suggestions |
+| `GET` | `/api/v1/search/stats` | Get search engine metrics & top queries |
+| `GET` / `PUT` | `/api/v1/search/preferences` | Get / update vault ranking weights |
+
+
 

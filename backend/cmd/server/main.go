@@ -19,6 +19,9 @@ import (
 	personaApp "github.com/diablovocado/declutr/modules/persona/application"
 	personaRepository "github.com/diablovocado/declutr/modules/persona/repository"
 	personaTransport "github.com/diablovocado/declutr/modules/persona/transport"
+	searchApp "github.com/diablovocado/declutr/modules/search/application"
+	searchRepository "github.com/diablovocado/declutr/modules/search/repository"
+	searchTransport "github.com/diablovocado/declutr/modules/search/transport"
 	"github.com/diablovocado/declutr/pkg/health"
 	"github.com/diablovocado/declutr/shared/database"
 	"github.com/diablovocado/declutr/shared/middleware"
@@ -141,6 +144,35 @@ func main() {
 	http.HandleFunc("/api/v1/embedding/history", embeddingAPI.GetHistory)
 	http.HandleFunc("/api/v1/embedding/provider", embeddingAPI.UpdateProvider)
 	http.HandleFunc("/api/v1/embedding/rebuild", embeddingAPI.RebuildVersion)
+
+	// Hybrid Knowledge Search Engine Module initialization
+	searchRepo := searchRepository.NewInMemorySearchRepository()
+	searchSvc := searchApp.NewSearchService(searchRepo, embeddingSvc)
+	searchEngine := searchApp.NewHybridSearchEngine(searchSvc)
+	_ = searchEngine // available for internal retrieval calls
+	searchAPI := searchTransport.NewSearchAPI(searchSvc)
+
+	http.HandleFunc("/api/v1/search/query", searchAPI.ExecuteSearch)
+	http.HandleFunc("/api/v1/search/saved", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			searchAPI.SaveSearch(w, r)
+		case http.MethodDelete:
+			searchAPI.DeleteSavedSearch(w, r)
+		default:
+			searchAPI.GetSavedSearches(w, r)
+		}
+	})
+	http.HandleFunc("/api/v1/search/history", searchAPI.GetHistory)
+	http.HandleFunc("/api/v1/search/suggestions", searchAPI.GetSuggestions)
+	http.HandleFunc("/api/v1/search/stats", searchAPI.GetStats)
+	http.HandleFunc("/api/v1/search/preferences", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPut {
+			searchAPI.UpdatePreferences(w, r)
+		} else {
+			searchAPI.GetPreferences(w, r)
+		}
+	})
 
 	log.Println("Declutr Backend Running on :8080")
 

@@ -41,6 +41,17 @@ Declutr is structured as a production-grade modular monorepo:
 
 ## 📜 Dev History (Commit Log Summary)
 
+- **Hybrid Knowledge Search Engine (Issue #020)**:
+  - Created PostgreSQL database migration `database/migrations/016_create_search_tables.sql` (`search_history`, `saved_searches`, `search_statistics`, `search_preferences`, `search_index_versions`).
+  - Implemented domain models for `ParsedQuery`, `SearchPlan`, `SearchQueryRequest`, `SearchResultItem`, `SearchQueryResponse`, `SavedSearch`, `SearchHistoryItem`, `SearchStats`, `SearchPreferences`, `RankingWeights`, `SearchFilters`.
+  - Built `QueryParser` detecting intent, entities, locations, file types, quoted exact terms, excluded terms (`-term`), and year/date ranges.
+  - Built `SearchPlanner` dynamically selecting strategy combinations (Keyword, Vector, Entity, Context, Relationship, Memory, Metadata).
+  - Built `SearchService` & `HybridSearchEngine` executing parallel retrievers, weighted score fusion, deduplication, and complete match explainability (`WhyMatched`, `ContributingStrategies`, `MatchedEntities`, `MatchedContexts`, `RelatedMemories`).
+  - Added 8 REST API endpoints (`POST /search/query`, `POST /search/saved`, `GET /search/saved`, `DELETE /search/saved`, `GET /search/history`, `GET /search/suggestions`, `GET /search/stats`, `GET/PUT /search/preferences`).
+  - Created Web UI module (`frontend/features/search/components/`) featuring `GlobalSearch`, `SearchResults`, `AdvancedFilters`, `SavedSearches`, and Next.js page route (`/search`).
+  - Created Mobile UI components (`frontend/declutr-mobile/features/search/components/`): `GlobalSearch.tsx`, `SearchResults.tsx`, `SearchFilters.tsx`, `SavedSearches.tsx`.
+  - Added comprehensive Go test suite (`search_test.go`) — 7/7 tests passing: Query Parsing, Keyword Search, Hybrid Search & Fusion, Search Filtering, Match Explainability, Saved Searches, Search History & Stats.
+
 - **Embedding Engine & Knowledge Representation Layer (Issue #019)**:
   - Created PostgreSQL database migration `database/migrations/015_create_embedding_tables.sql` (`embeddings`, `embedding_chunks`, `embedding_versions`, `embedding_jobs`, `embedding_providers`, `vector_metadata`).
   - Implemented domain models for `Embedding`, `EmbeddingChunk`, `EmbeddingVersion`, `EmbeddingJob`, `EmbeddingProviderConfig`, `VectorMetadata`, `StructuredRepresentationInput`, `ChunkResult`, `GenerationOptions`, `EmbeddingStats`.

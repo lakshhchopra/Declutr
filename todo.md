@@ -100,8 +100,16 @@ This document tracks the comprehensive roadmap and action items to complete the 
   - Web UI: EmbeddingDashboard, EmbeddingStatus, ModelInformation, GenerationHistory, `/embedding` page route
   - Mobile UI: EmbeddingStatus, ProcessingProgress
   - 6/6 Go tests passing
-- [ ] Hybrid Search query processor (`POST /v1/search/query`):
-  - Combine traditional PostgreSQL full-text search (keyword) and pgvector semantic distance
+- [x] Hybrid Search Engine (`POST /api/v1/search/query`):
+  - Database migration `016_create_search_tables.sql` (5 tables: search_history, saved_searches, search_statistics, search_preferences, search_index_versions)
+  - Query Parser detecting intent, entities, locations, file types, quoted terms, excluded terms, and date ranges
+  - Search Planner dynamically selecting strategy combinations (Keyword, Vector, Entity, Context, Relationship, Memory, Metadata)
+  - Weighted Score Fusion combining keyword FTS, vector embeddings, entity match, context intent match, and recency
+  - Complete match explainability (WhyMatched, ContributingStrategies, MatchedEntities, MatchedContexts, RelatedMemories)
+  - 8 REST API endpoints (query, saved searches, history, suggestions, stats, preferences)
+  - Web UI: GlobalSearch, SearchResults, AdvancedFilters, SavedSearches, `/search` page route
+  - Mobile UI: GlobalSearch, SearchResults, SearchFilters, SavedSearches
+  - 7/7 Go tests passing
 - [x] Reverse Persona Engine:
   - [x] Collect user interaction signals (ASSET_OPEN, SEARCH, PIN, UPLOAD, EDIT, CONTEXT_SWITCH, RELATIONSHIP_EXPLORE, COLLECTION_USE, TIME_OF_DAY, SEARCH_REFINEMENT, DASHBOARD_USAGE, FAVOURITE)
   - [x] Build personalization profile with time-based recency decay (exponential: `e^(−λ × days)`)

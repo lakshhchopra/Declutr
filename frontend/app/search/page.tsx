@@ -1,35 +1,54 @@
-"use client";
+'use client';
 
-import React from "react";
-import { Search } from "lucide-react";
-import { PageShell } from "../../shared/components/layout/page-shell";
-import { SearchInput } from "../../shared/components/ui/input";
-import { Badge } from "../../shared/components/ui/badge";
-import { EmptyState } from "../../shared/components/feedback/empty-state";
+import React, { useState } from 'react';
+import type { SearchQueryResponse, SearchFilters } from '../../features/search/types/search';
+import { GlobalSearch } from '../../features/search/components/global-search';
+import { SearchResults } from '../../features/search/components/search-results';
+import { AdvancedFilters } from '../../features/search/components/advanced-filters';
+import { SavedSearches } from '../../features/search/components/saved-searches';
 
 export default function SearchPage() {
+  const [response, setResponse] = useState<SearchQueryResponse | null>(null);
+  const [filters, setFilters] = useState<SearchFilters>({});
+
+  const handleSelectSaved = (query: string) => {
+    // Triggers search via GlobalSearch update
+  };
+
   return (
-    <PageShell
-      title="Semantic Search Engine"
-      subtitle="Hybrid search combining PostgreSQL Full-Text Search and pgvector 512-dim cosine distance."
-      breadcrumbs={[{ label: "Declutr", href: "/" }, { label: "Search" }]}
-    >
-      <div className="mb-6 space-y-4">
-        <SearchInput placeholder="Enter natural language query e.g. 'hotel booking receipt Mumbai'..." />
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-slate-400">Quick Filters:</span>
-          <Badge variant="emerald" className="cursor-pointer">Receipts</Badge>
-          <Badge variant="blue" className="cursor-pointer">PDF Documents</Badge>
-          <Badge variant="amber" className="cursor-pointer">Travel</Badge>
-          <Badge variant="outline" className="cursor-pointer">Last 30 Days</Badge>
-        </div>
+    <div style={styles.page}>
+      {/* Page Header */}
+      <div style={styles.header}>
+        <h1 style={styles.heading}>Hybrid Knowledge Search Engine</h1>
+        <p style={styles.subheading}>
+          Unified multi-strategy search layer — fusing keyword matching, vector embeddings, canonical entities, contexts, and memory strength into a single explainable result feed.
+        </p>
       </div>
 
-      <EmptyState
-        icon={<Search className="h-6 w-6" />}
-        title="Natural Language Hybrid Search"
-        description="Type a query or select a filter badge above to execute hybrid vector search."
-      />
-    </PageShell>
+      {/* Main Container */}
+      <div style={styles.container}>
+        {/* Left Search & Results Section */}
+        <div style={styles.mainCol}>
+          <GlobalSearch onSearchComplete={setResponse} activeFilters={filters} />
+          <SearchResults response={response} />
+        </div>
+
+        {/* Right Sidebar Filters & Saved Searches */}
+        <div style={styles.sidebarCol}>
+          <AdvancedFilters filters={filters} onChange={setFilters} />
+          <SavedSearches onSelectSearch={handleSelectSaved} />
+        </div>
+      </div>
+    </div>
   );
 }
+
+const styles: Record<string, React.CSSProperties> = {
+  page: { minHeight: '100vh', background: '#0f172a', color: '#e2e8f0', fontFamily: 'Inter, system-ui, sans-serif', paddingBottom: '40px' },
+  header: { padding: '32px 24px 0', maxWidth: '1080px', margin: '0 auto' },
+  heading: { fontSize: '32px', fontWeight: 800, color: '#e0e7ff', marginBottom: '8px', background: 'linear-gradient(135deg, #6366f1 0%, #38bdf8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
+  subheading: { fontSize: '14px', color: '#64748b', margin: 0, lineHeight: 1.5 },
+  container: { display: 'flex', gap: '24px', maxWidth: '1080px', margin: '24px auto 0', padding: '0 24px' },
+  mainCol: { flex: 1 },
+  sidebarCol: { display: 'flex', flexDirection: 'column', gap: '20px' },
+};
