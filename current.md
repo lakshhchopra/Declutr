@@ -1,48 +1,43 @@
 # Project Status - Declutr
 
 **Status**: 🎉 **Production Ready**
-**Version**: `v1.0.0` (General Availability)
+**Version**: `v2.0.0`
 
 This document provides a summary of the current status of the Declutr codebase, its architecture, and its git history.
 
 ## 🛠️ Codebase Overview
 
-Declutr is structured as a production-grade modular monorepo:
+Declutr is a clean, modular monorepo optimized for developer experience.
 
-1. **Backend ([/backend](file:///f:/Github/Declutr/backend))**
-   - Written in Go.
-   - Refactored into a Domain-Oriented Modular Monolith:
-     - `cmd/server/`: Main application entrypoint (`main.go`).
-     - `modules/`: Feature modules (`auth`, `vault`, `file`, `search`, `persona`, `behavior`) each owning their `domain`, `application`, `repository`, `transport`, and `validators` layers.
-     - `shared/`: Cross-cutting concerns (`crypto`, `database`, `middleware`, `config`, `logger`, `errors`, `constants`, `utils`, `types`).
-     - `platform/`: Platform drivers (`postgres`, `redis`, `storage`).
-     - `pkg/`: Public utility packages (`health`).
-2. **Web Frontend ([/frontend](file:///f:/Github/Declutr/frontend))**
-   - Next.js application using TypeScript.
-   - Restructured into feature-first architecture:
-     - `app/`: Next.js App router pages.
-     - `features/`: Web feature modules (`auth`, `vault`, `search`).
-     - `shared/`: Shared components (`ui`, `layout`, `feedback`, `forms`), `hooks`, `lib`, `providers`, `services`, `api`, `types`, `constants`.
-     - `styles/`: Global CSS styling.
-3. **Mobile Frontend ([/frontend/declutr-mobile](file:///f:/Github/Declutr/frontend/declutr-mobile))**
-   - React Native application managed via **Expo** (with TypeScript).
-   - Core directories:
-     - `app/`: Expo Router pages (`(tabs)`, `login`, `register`, `vault`, `modal`).
-     - `features/`: Mobile feature modules.
-     - `shared/`: Native components, constants, hooks, providers, services, api, and utils.
-     - `navigation/`: Router navigation helpers.
-4. **Database ([/database](file:///f:/Github/Declutr/database))**
-   - Database project containing `migrations/`, `seeds/`, and `scripts/`.
-5. **Docs & Supporting Infrastructure**
-   - Categorized into `docs/architecture/`, `docs/api/`, `docs/development/`, `docs/references/`, `docs/adr/`, and `docs/images/`.
-   - Infrastructure configurations under `infrastructure/` (`docker`, `compose`, `github`, `monitoring`, `deployment`, `terraform`, `kubernetes`).
-   - Helper scripts under `scripts/` (`setup`, `dev`, `build`, `release`, `database`, `maintenance`).
-   - Testing suites under `tests/` (`unit`, `integration`, `e2e`, `fixtures`, `helpers`).
-   - Security documentation under `security/` (`policies`, `audits`, `documentation`).
+1. **Backend ([/backend](file:///f:/Github/Declutr/backend))** — Go REST API
+   - `cmd/server/main.go` — Entry point, wires all 25+ modules and HTTP routes.
+   - `modules/` — One directory per feature (auth, vault, ai, search, lifeos, agents, …). Each module contains `domain/`, `application/`, `repository/`, `transport/`.
+   - `shared/` — Config, middleware, database helpers, observability.
+   - `pkg/health/` — Liveness, readiness, metrics handlers.
+   - `tests/` — Integration test suites.
+2. **Web Frontend ([/frontend](file:///f:/Github/Declutr/frontend))** — Next.js 14 (App Router)
+   - `app/` — Page routes.
+   - `features/` — Feature-level UI components.
+   - `shared/` — Shared components, hooks, services.
+   - `styles/` — Global CSS.
+3. **Mobile ([/frontend/declutr-mobile](file:///f:/Github/Declutr/frontend/declutr-mobile))** — React Native + Expo
+4. **Database ([/database/migrations](file:///f:/Github/Declutr/database/migrations))** — 10 consolidated SQL migration files (001–010).
+5. **Docs ([/docs/declutr_architecture_document.html](file:///f:/Github/Declutr/docs/declutr_architecture_document.html))** — Single interactive HTML source of truth.
+6. **Deployment** — `docker-compose.yml` for one-command local dev. Cloud: Railway/Vercel/Supabase/Cloudflare R2/Upstash.
 
 ---
 
 ## 📜 Dev History (Commit Log Summary)
+
+- **Repository Refactoring & Developer Experience (refactor)**:
+  - Consolidated 34 database migrations into 10 domain-grouped files (`001_users_and_auth.sql` → `010_intelligence_agents_predictive_lifeos.sql`).
+  - Removed enterprise over-engineering: `infrastructure/kubernetes/`, `infrastructure/helm/`, `infrastructure/terraform/`, `infrastructure/monitoring/`.
+  - Removed 18 redundant markdown documentation subdirectories under `docs/`; consolidated all documentation into `docs/declutr_architecture_document.html` as single interactive source of truth.
+  - Removed root-level `security/`, `tests/`, `sdks/ruby`, `sdks/python`, `sdks/go` directories.
+  - Rewrote `README.md` for clean 30-minute developer onboarding (overview, tech stack, directory map, quick start, env setup, deployment guide, contributing).
+  - Wrote `docs/declutr_architecture_document.html` — modern interactive dark-mode docs site with sidebar navigation, architecture diagrams, pipeline visualizations, DB schema, API reference, env vars, deployment guide, and roadmap.
+  - Created clean `docker-compose.yml` for one-command local dev (Postgres + Redis + Backend + Frontend).
+  - Rewrote `.env.example` with all variables documented inline.
 
 - **Life Operating System (LifeOS) (Issue #040)**:
   - Transformed Declutr into an operating system for digital life structured around Life Areas, Projects, and Goals instead of raw directory folders.

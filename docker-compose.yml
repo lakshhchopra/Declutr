@@ -1,80 +1,49 @@
-version: '3.8'
+version: "3.9"
 
 services:
-  declutr-backend:
-    build:
-      context: ./backend
-      dockerfile: ../infrastructure/docker/Dockerfile.backend
-    ports:
-      - "8080:8080"
-    environment:
-      - APP_ENV=production
-      - PORT=8080
-      - DATABASE_URL=postgres://declutr:declutr_pass@postgres:5432/declutr_db?sslmode=disable
-      - REDIS_URL=redis:6379
-      - STORAGE_PROVIDER=minio
-      - VECTOR_DB_PROVIDER=pgvector
-    depends_on:
-      - postgres
-      - redis
-      - minio
-    restart: always
-
-  declutr-web:
-    build:
-      context: ./frontend
-      dockerfile: ../infrastructure/docker/Dockerfile.frontend
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - NEXT_PUBLIC_API_URL=http://localhost:8080
-    depends_on:
-      - declutr-backend
-    restart: always
-
-  postgres:
-    image: pgvector/pgvector:pg16
-    ports:
-      - "5432:5432"
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
     environment:
       POSTGRES_USER: declutr
-      POSTGRES_PASSWORD: declutr_pass
-      POSTGRES_DB: declutr_db
+      POSTGRES_PASSWORD: declutr
+      POSTGRES_DB: declutr
+    ports:
+      - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-    restart: always
+      - pgdata:/var/lib/postgresql/data
+      - ./database/migrations:/docker-entrypoint-initdb.d
 
   redis:
     image: redis:7-alpine
+    restart: unless-stopped
     ports:
       - "6379:6379"
-    volumes:
-      - redis_data:/data
-    restart: always
 
-  minio:
-    image: minio/minio:latest
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - db
+      - redis
     ports:
-      - "9000:9000"
-      - "9001:9001"
-    environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadminpassword
-    command: server /data --console-address ":9001"
-    volumes:
-      - minio_data:/data
-    restart: always
+      - "8080:8080"
+    env_file:
+      - .env
 
-  prometheus:
-    image: prom/prometheus:latest
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - backend
     ports:
-      - "9090:9090"
-    volumes:
-      - ./infrastructure/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
-    restart: always
+      - "3000:3000"
+    env_file:
+      - .env
 
 volumes:
-  postgres_data:
-  redis_data:
-  minio_data:
+  pgdata:

@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Declutr — Architecture & Developer Guide</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --border: #2a2d3a;
+      --accent: #6366f1;
+      --accent-dim: #6366f130;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --green: #10b981;
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+      --mono: 'JetBrains Mono', 'Fira Code', monospace;
+      --sidebar-w: 240px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font); display: flex; min-height: 100vh; font-size: 15px; line-height: 1.7; }
+
+    /* ── Sidebar ── */
+    #sidebar {
+      width: var(--sidebar-w); background: var(--surface); border-right: 1px solid var(--border);
+      position: fixed; top: 0; left: 0; bottom: 0; overflow-y: auto; padding: 24px 0;
+      display: flex; flex-direction: column; gap: 4px; z-index: 100;
+    }
+    #sidebar .logo { padding: 0 20px 20px; border-bottom: 1px solid var(--border); margin-bottom: 12px; }
+    #sidebar .logo h1 { font-size: 18px; font-weight: 800; color: var(--accent); }
+    #sidebar .logo p { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    #sidebar a {
+      display: block; padding: 7px 20px; font-size: 13px; color: var(--muted);
+      text-decoration: none; border-left: 2px solid transparent; transition: all .15s;
+    }
+    #sidebar a:hover, #sidebar a.active {
+      color: var(--text); background: var(--accent-dim); border-left-color: var(--accent);
+    }
+    #sidebar .section-label { padding: 14px 20px 4px; font-size: 10px; font-weight: 700; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; }
+
+    /* ── Main ── */
+    #main { margin-left: var(--sidebar-w); padding: 48px 64px; max-width: 960px; width: 100%; }
+    section { margin-bottom: 72px; scroll-margin-top: 32px; }
+    h2 { font-size: 26px; font-weight: 800; margin-bottom: 8px; color: var(--text); }
+    h3 { font-size: 17px; font-weight: 700; margin: 32px 0 10px; color: var(--text); }
+    h4 { font-size: 14px; font-weight: 700; margin: 20px 0 6px; color: var(--accent); }
+    p { color: var(--muted); margin-bottom: 12px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .subtitle { font-size: 15px; color: var(--muted); margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+
+    /* ── Code ── */
+    pre, code { font-family: var(--mono); font-size: 13px; }
+    pre { background: #12141c; border: 1px solid var(--border); border-radius: 10px; padding: 20px; overflow-x: auto; margin: 12px 0 20px; line-height: 1.6; }
+    code:not(pre code) { background: #1e2130; padding: 2px 6px; border-radius: 4px; font-size: 12px; color: #a5b4fc; }
+
+    /* ── Tables ── */
+    table { width: 100%; border-collapse: collapse; margin: 12px 0 24px; font-size: 13px; }
+    th { text-align: left; padding: 10px 14px; background: var(--surface); border-bottom: 1px solid var(--border); color: var(--text); font-weight: 700; }
+    td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--muted); }
+    tr:hover td { background: var(--surface); color: var(--text); }
+
+    /* ── Badges ── */
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; font-family: var(--mono); }
+    .badge-green { background: #10b98120; color: var(--green); }
+    .badge-blue  { background: #6366f120; color: #818cf8; }
+    .badge-amber { background: #f59e0b20; color: var(--amber); }
+
+    /* ── Pipeline diagram ── */
+    .pipeline { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; margin: 12px 0 24px; }
+    .pipeline-step { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; }
+    .pipeline-arrow { color: var(--muted); font-size: 16px; }
+
+    /* ── Cards ── */
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin: 12px 0 24px; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+    .card-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .card-desc { font-size: 12px; color: var(--muted); }
+
+    /* ── Folder tree ── */
+    .tree { background: #12141c; border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; font-family: var(--mono); font-size: 13px; line-height: 1.8; overflow-x: auto; }
+    .tree .dir { color: #93c5fd; }
+    .tree .file { color: var(--muted); }
+    .tree .comment { color: #4b5563; }
+
+    /* ── Roadmap ── */
+    .roadmap-item { display: flex; align-items: flex-start; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+    .roadmap-item:last-child { border-bottom: none; }
+    .roadmap-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 7px; }
+    .dot-done  { background: var(--green); }
+    .dot-open  { background: var(--border); border: 2px solid var(--muted); }
+    .roadmap-title { font-size: 14px; font-weight: 700; color: var(--text); }
+    .roadmap-desc  { font-size: 12px; color: var(--muted); }
+  </style>
+</head>
+<body>
+
+<nav id="sidebar">
+  <div class="logo">
+    <h1>Declutr</h1>
+    <p>Architecture & Developer Guide</p>
+  </div>
+  <div class="section-label">Overview</div>
+  <a href="#overview">Introduction</a>
+  <a href="#architecture">Architecture</a>
+  <a href="#structure">Folder Structure</a>
+  <div class="section-label">Backend</div>
+  <a href="#auth">Authentication</a>
+  <a href="#upload">Upload Pipeline</a>
+  <a href="#ai">AI Pipeline</a>
+  <a href="#search">Search Pipeline</a>
+  <a href="#lifeos">Life Operating System</a>
+  <a href="#agents">Agent Platform</a>
+  <div class="section-label">Data</div>
+  <a href="#database">Database</a>
+  <a href="#env">Environment Variables</a>
+  <div class="section-label">Deploy</div>
+  <a href="#deployment">Deployment</a>
+  <a href="#quickstart">Quick Start</a>
+  <div class="section-label">Project</div>
+  <a href="#roadmap">Roadmap</a>
+  <a href="#progress">Current Progress</a>
+</nav>
+
+<main id="main">
+
+  <!-- ═══════════════════════════════════════════════ OVERVIEW -->
+  <section id="overview">
+    <h2>Declutr</h2>
+    <p class="subtitle">Your personal knowledge operating system — private, AI-powered, and built for the way you actually think.</p>
+
+    <p>Declutr stores every document, note, and file in an end-to-end encrypted Vault, then gives you an AI copilot that can search, summarize, and reason over everything you've ever saved — organized around the Life Areas, Projects, and Goals in your life.</p>
+
+    <div class="card-grid">
+      <div class="card"><div class="card-title">🔒 Zero-Knowledge Vault</div><div class="card-desc">SRP-based auth, client-side encryption. Server never sees your data.</div></div>
+      <div class="card"><div class="card-title">🤖 Grounded AI Copilot</div><div class="card-desc">RAG-powered chat with citations from your own files.</div></div>
+      <div class="card"><div class="card-title">🧠 Semantic Search</div><div class="card-desc">Hybrid keyword + vector search across all assets.</div></div>
+      <div class="card"><div class="card-title">🗂️ Life OS</div><div class="card-desc">Life Areas → Projects → Goals instead of folders.</div></div>
+      <div class="card"><div class="card-title">🔮 Predictive Intelligence</div><div class="card-desc">Proactive suggestions before you ask.</div></div>
+      <div class="card"><div class="card-title">🤝 Multi-Agent Platform</div><div class="card-desc">Specialist AI agents that collaborate on complex tasks.</div></div>
+      <div class="card"><div class="card-title">🏢 Organizations</div><div class="card-desc">Multi-tenant workspaces with role-based access control.</div></div>
+      <div class="card"><div class="card-title">🧩 Extension Marketplace</div><div class="card-desc">Sandboxed, versioned third-party extensions.</div></div>
+    </div>
+
+    <h3>Tech Stack</h3>
+    <table>
+      <tr><th>Layer</th><th>Technology</th></tr>
+      <tr><td>Frontend</td><td>Next.js 14 (App Router), TypeScript, Tailwind CSS, shadcn/ui</td></tr>
+      <tr><td>Mobile</td><td>React Native + Expo</td></tr>
+      <tr><td>Backend</td><td>Go 1.22, <code>net/http</code>, modular architecture</td></tr>
+      <tr><td>Database</td><td>PostgreSQL 16</td></tr>
+      <tr><td>Cache</td><td>Redis 7</td></tr>
+      <tr><td>AI</td><td>OpenAI / Gemini (pluggable providers)</td></tr>
+      <tr><td>Storage</td><td>Cloudflare R2 / S3-compatible</td></tr>
+      <tr><td>Auth</td><td>SRP (Secure Remote Password) — zero-knowledge</td></tr>
+    </table>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════ ARCHITECTURE -->
+  <section id="architecture">
+    <h2>Architecture</h2>
+    <p>Declutr follows a modular, feature-based architecture. Each capability lives in its own module with minimal inter-module dependencies.</p>
+
+    <div class="pipeline">
+      <div class="pipeline-step">Client (Web / Mobile)</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">REST API (Go)</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">Module Handler</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">Service / Engine</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">PostgreSQL + Redis</div>
+    </div>
+
+    <h3>Backend Module Map</h3>
+    <table>
+      <tr><th>Module</th><th>Route Prefix</th><th>Responsibility</th></tr>
+      <tr><td><code>auth</code></td><td><code>/api/v1/auth</code></td><td>SRP registration, login, session management</td></tr>
+      <tr><td><code>vault</code></td><td><code>/api/v1/vaults</code></td><td>Encrypted asset storage</td></tr>
+      <tr><td><code>embedding</code></td><td><code>/api/v1/embedding</code></td><td>Vector generation and versioning</td></tr>
+      <tr><td><code>search</code></td><td><code>/api/v1/search</code></td><td>Hybrid keyword + semantic search</td></tr>
+      <tr><td><code>copilot</code></td><td><code>/api/v1/copilot</code></td><td>Grounded RAG AI conversations</td></tr>
+      <tr><td><code>memory</code></td><td><code>/api/v1/memory</code></td><td>Episodic + semantic memory engine</td></tr>
+      <tr><td><code>persona</code></td><td><code>/api/v1/persona</code></td><td>Reverse persona modeling</td></tr>
+      <tr><td><code>context</code></td><td><code>/api/v1/context</code></td><td>Context and intent detection</td></tr>
+      <tr><td><code>insights</code></td><td><code>/api/v1/insights</code></td><td>Knowledge milestones and timeline</td></tr>
+      <tr><td><code>workflow</code></td><td><code>/api/v1/workflows</code></td><td>Automation rule engine</td></tr>
+      <tr><td><code>notification</code></td><td><code>/api/v1/notifications</code></td><td>Proactive notification center</td></tr>
+      <tr><td><code>collaboration</code></td><td><code>/api/v1/shares</code></td><td>Secure sharing and permissions</td></tr>
+      <tr><td><code>versioning</code></td><td><code>/api/v1/versions</code></td><td>Version history and time machine</td></tr>
+      <tr><td><code>backup</code></td><td><code>/api/v1/backups</code></td><td>Disaster recovery</td></tr>
+      <tr><td><code>sync</code></td><td><code>/api/v1/sync</code></td><td>Offline-first conflict resolution</td></tr>
+      <tr><td><code>integrations</code></td><td><code>/api/v1/integrations</code></td><td>External connector framework</td></tr>
+      <tr><td><code>organization</code></td><td><code>/api/v1/organizations</code></td><td>Enterprise multi-tenancy</td></tr>
+      <tr><td><code>developer</code></td><td><code>/api/v1/developer</code></td><td>Public API keys, webhooks, OAuth2</td></tr>
+      <tr><td><code>extension</code></td><td><code>/api/v1/extensions</code></td><td>Isolated extension sandbox + marketplace</td></tr>
+      <tr><td><code>security</code></td><td><code>/api/v1/security</code></td><td>Audit log, risk assessment</td></tr>
+      <tr><td><code>agent</code></td><td><code>/api/v1/agents</code></td><td>Autonomous knowledge agents</td></tr>
+      <tr><td><code>multiagent</code></td><td><code>/api/v1/multiagent</code></td><td>Multi-agent coordinator &amp; message bus</td></tr>
+      <tr><td><code>predictive</code></td><td><code>/api/v1/predictive</code></td><td>Predictive intelligence engine</td></tr>
+      <tr><td><code>lifeos</code></td><td><code>/api/v1/lifeos</code></td><td>Life Areas, Projects, Goals</td></tr>
+    </table>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════ FOLDER STRUCTURE -->
+  <section id="structure">
+    <h2>Folder Structure</h2>
+    <div class="tree">
+<span class="dir">declutr/</span>
+├── <span class="dir">backend/</span>                     <span class="comment"># Go REST API</span>
+│   ├── <span class="dir">cmd/server/</span>
+│   │   └── <span class="file">main.go</span>             <span class="comment"># Entry point, wires all modules</span>
+│   ├── <span class="dir">modules/</span>                <span class="comment"># One directory per feature</span>
+│   │   ├── <span class="dir">auth/</span>
+│   │   ├── <span class="dir">ai/</span>
+│   │   ├── <span class="dir">agent/</span>
+│   │   ├── <span class="dir">backup/</span>
+│   │   ├── <span class="dir">collaboration/</span>
+│   │   ├── <span class="dir">context/</span>
+│   │   ├── <span class="dir">copilot/</span>
+│   │   ├── <span class="dir">developer/</span>
+│   │   ├── <span class="dir">embedding/</span>
+│   │   ├── <span class="dir">extension/</span>
+│   │   ├── <span class="dir">insights/</span>
+│   │   ├── <span class="dir">integrations/</span>
+│   │   ├── <span class="dir">lifeos/</span>
+│   │   ├── <span class="dir">memory/</span>
+│   │   ├── <span class="dir">multiagent/</span>
+│   │   ├── <span class="dir">notification/</span>
+│   │   ├── <span class="dir">organization/</span>
+│   │   ├── <span class="dir">persona/</span>
+│   │   ├── <span class="dir">predictive/</span>
+│   │   ├── <span class="dir">search/</span>
+│   │   ├── <span class="dir">security/</span>
+│   │   ├── <span class="dir">sync/</span>
+│   │   ├── <span class="dir">versioning/</span>
+│   │   └── <span class="dir">workflow/</span>
+│   ├── <span class="dir">shared/</span>                 <span class="comment"># Config, DB, middleware, observability</span>
+│   ├── <span class="dir">pkg/health/</span>             <span class="comment"># Health, liveness, readiness handlers</span>
+│   └── <span class="dir">tests/</span>                  <span class="comment"># Integration tests per module</span>
+│
+├── <span class="dir">database/</span>
+│   └── <span class="dir">migrations/</span>             <span class="comment"># 10 grouped SQL migrations (001–010)</span>
+│
+├── <span class="dir">docs/</span>
+│   └── <span class="file">declutr_architecture_document.html</span>  <span class="comment"># You are here</span>
+│
+├── <span class="dir">frontend/</span>                   <span class="comment"># Next.js 14 web app</span>
+│   ├── <span class="dir">app/</span>                    <span class="comment"># App Router pages</span>
+│   ├── <span class="dir">features/</span>               <span class="comment"># Feature-level components</span>
+│   ├── <span class="dir">shared/</span>                 <span class="comment"># Shared UI components</span>
+│   ├── <span class="dir">styles/</span>
+│   └── <span class="dir">declutr-mobile/</span>        <span class="comment"># React Native + Expo</span>
+│
+├── <span class="file">docker-compose.yml</span>          <span class="comment"># One-command local dev</span>
+├── <span class="file">.env.example</span>                <span class="comment"># All env vars documented</span>
+└── <span class="file">README.md</span>
+    </div>
+
+    <h3>Module Internal Structure</h3>
+    <p>Each module follows this consistent layout:</p>
+    <div class="tree">
+<span class="dir">modules/example/</span>
+├── <span class="dir">application/</span>    <span class="comment"># Business logic (service.go, engine.go)</span>
+├── <span class="dir">domain/</span>         <span class="comment"># Data models and constants</span>
+├── <span class="dir">repository/</span>     <span class="comment"># Database access</span>
+└── <span class="dir">transport/</span>      <span class="comment"># HTTP handlers (api.go)</span>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════ AUTH -->
+  <section id="auth">
+    <h2>Authentication</h2>
+    <p>Declutr uses <strong>SRP (Secure Remote Password)</strong> — a zero-knowledge protocol. The server never sees your password, not even at registration.</p>
+
+    <h3>Registration Flow</h3>
+    <div class="pipeline">
+      <div class="pipeline-step">Client generates SRP verifier from password</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">POST /api/v1/auth/register (email + verifier + salt)</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">Server stores verifier (never the password)</div>
+    </div>
+
+    <h3>Login Flow</h3>
+    <div class="pipeline">
+      <div class="pipeline-step">POST /auth/login/start</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">Server sends SRP challenge</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">Client computes proof</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">POST /auth/login/finish</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">Server verifies proof, returns JWT</div>
+    </div>
+
+    <h3>API Endpoints</h3>
+    <table>
+      <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+      <tr><td><span class="badge badge-green">POST</span></td><td><code>/api/v1/auth/register</code></td><td>Create account (SRP verifier + salt)</td></tr>
+      <tr><td><span class="badge badge-green">POST</span></td><td><code>/api/v1/auth/login/start</code></td><td>Begin SRP handshake</td></tr>
+      <tr><td><span class="badge badge-green">POST</span></td><td><code>/api/v1/auth/login/finish</code></td><td>Complete SRP handshake, get JWT</td></tr>
+      <tr><td><span class="badge badge-blue">GET</span></td><td><code>/api/v1/me</code></td><td>Get authenticated user (requires JWT)</td></tr>
+    </table>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════ UPLOAD -->
+  <section id="upload">
+    <h2>Upload Pipeline</h2>
+    <div class="pipeline">
+      <div class="pipeline-step">Client selects file</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">POST /api/v1/vaults/:id/assets</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">Store to R2</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">Queue processing job</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">OCR / text extraction</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">Generate embeddings</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">Index in search</div>
+    </div>
+
+    <p>The processing queue is handled by background workers managed by the <code>supervisor</code> package. Workers run as goroutines inside the server process.</p>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════ AI -->
+  <section id="ai">
+    <h2>AI Pipeline</h2>
+
+    <h3>Grounded RAG Copilot</h3>
+    <div class="pipeline">
+      <div class="pipeline-step">User message</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">Embed query</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">Hybrid search (keyword + vector)</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">Top-k context chunks</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">Build system prompt</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">LLM call (OpenAI / Gemini)</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">Response + citations</div>
+    </div>
+
+    <h3>AI Provider Configuration</h3>
+    <table>
+      <tr><th>Provider</th><th>Env Var</th><th>Models</th></tr>
+      <tr><td>OpenAI</td><td><code>OPENAI_API_KEY</code></td><td>gpt-4o, text-embedding-3-small</td></tr>
+      <tr><td>Google Gemini</td><td><code>GEMINI_API_KEY</code></td><td>gemini-1.5-pro, gemini-embedding</td></tr>
+    </table>
+    <p>Providers are pluggable. At least one must be configured for AI features to function.</p>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════ SEARCH -->
+  <section id="search">
+    <h2>Search Pipeline</h2>
+    <p>Declutr uses a <strong>hybrid search</strong> approach — combining full-text BM25 keyword search with vector semantic search, then fusing results with Reciprocal Rank Fusion (RRF).</p>
+
+    <div class="pipeline">
+      <div class="pipeline-step">Query string</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">Parallel: BM25 + Vector similarity</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">RRF score fusion</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">Ranked results + snippets</div>
+    </div>
+
+    <h3>API Endpoints</h3>
+    <table>
+      <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+      <tr><td><span class="badge badge-green">POST</span></td><td><code>/api/v1/search/query</code></td><td>Execute hybrid search</td></tr>
+      <tr><td><span class="badge badge-blue">GET</span></td><td><code>/api/v1/search/suggestions</code></td><td>Autocomplete suggestions</td></tr>
+      <tr><td><span class="badge badge-blue">GET</span></td><td><code>/api/v1/search/history</code></td><td>Recent search history</td></tr>
+      <tr><td><span class="badge badge-green">POST</span></td><td><code>/api/v1/search/saved</code></td><td>Save a search query</td></tr>
+    </table>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════ LIFEOS -->
+  <section id="lifeos">
+    <h2>Life Operating System (LifeOS)</h2>
+    <p>Declutr organizes your knowledge around <strong>Life Areas, Projects, and Goals</strong> — not folders and directories.</p>
+
+    <div class="pipeline">
+      <div class="pipeline-step">Life Area</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">Project</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">Goal</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">Contexts</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">Knowledge &amp; Assets</div>
+    </div>
+
+    <h3>Default Life Areas</h3>
+    <p>12 built-in areas: <strong>Personal, Work, Business, Education, Finance, Health, Travel, Legal, Home, Family, Research, Hobbies</strong> — plus unlimited custom areas.</p>
+
+    <h3>API Endpoints</h3>
+    <table>
+      <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+      <tr><td><span class="badge badge-blue">GET</span></td><td><code>/api/v1/lifeos/dashboard</code></td><td>Unified LifeOS dashboard</td></tr>
+      <tr><td><span class="badge badge-blue">GET</span></td><td><code>/api/v1/lifeos/areas</code></td><td>List Life Areas</td></tr>
+      <tr><td><span class="badge badge-blue">GET</span></td><td><code>/api/v1/lifeos/projects</code></td><td>List projects</td></tr>
+      <tr><td><span class="badge badge-green">POST</span></td><td><code>/api/v1/lifeos/projects</code></td><td>Create project</td></tr>
+      <tr><td><span class="badge badge-green">POST</span></td><td><code>/api/v1/lifeos/goals</code></td><td>Create project goal</td></tr>
+      <tr><td><span class="badge badge-blue">GET</span></td><td><code>/api/v1/lifeos/timeline</code></td><td>Unified life timeline</td></tr>
+      <tr><td><span class="badge badge-blue">GET</span></td><td><code>/api/v1/lifeos/metrics</code></td><td>Life balance metrics</td></tr>
+    </table>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════ AGENTS -->
+  <section id="agents">
+    <h2>Agent Platform</h2>
+    <p>Declutr includes three layers of AI agency:</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-title">Autonomous Agents</div>
+        <div class="card-desc">Long-running agents that execute goals continuously: <code>/api/v1/agents</code></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Multi-Agent Coordinator</div>
+        <div class="card-desc">Specialist agents collaborating via message bus and DAG task graph: <code>/api/v1/multiagent</code></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Predictive Intelligence</div>
+        <div class="card-desc">16 proactive prediction types surfaced before you ask: <code>/api/v1/predictive</code></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════ DATABASE -->
+  <section id="database">
+    <h2>Database</h2>
+    <p>PostgreSQL 16. Migrations live in <code>database/migrations/</code> and are grouped into 10 logical domains. They run automatically via Docker Compose or can be run manually.</p>
+
+    <table>
+      <tr><th>Migration</th><th>Tables</th></tr>
+      <tr><td><code>001_users_and_auth.sql</code></td><td>users</td></tr>
+      <tr><td><code>002_sessions_and_security.sql</code></td><td>sessions, security_audit_events, trusted_devices</td></tr>
+      <tr><td><code>003_vaults_and_assets.sql</code></td><td>vaults, assets, asset_versions, recycle_bin</td></tr>
+      <tr><td><code>004_processing_and_embeddings.sql</code></td><td>asset_processing_jobs, vector_embeddings</td></tr>
+      <tr><td><code>005_ai_copilot_and_memory.sql</code></td><td>copilot_conversations, copilot_messages, episodic_memories, user_persona</td></tr>
+      <tr><td><code>006_search_and_insights.sql</code></td><td>saved_searches, search_history, knowledge_insights</td></tr>
+      <tr><td><code>007_workflows_and_notifications.sql</code></td><td>workflows, workflow_executions, notifications</td></tr>
+      <tr><td><code>008_organizations_and_sharing.sql</code></td><td>organizations, org_members, shares</td></tr>
+      <tr><td><code>009_developer_and_extensions.sql</code></td><td>api_keys, webhooks, extensions</td></tr>
+      <tr><td><code>010_intelligence_agents_predictive_lifeos.sql</code></td><td>agents, agent_goals, predictions, life_areas, projects, project_goals</td></tr>
+    </table>
+
+    <h3>Run migrations manually</h3>
+    <pre>psql $DATABASE_URL -f database/migrations/001_users_and_auth.sql
+# ... repeat for 002–010</pre>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════ ENV VARS -->
+  <section id="env">
+    <h2>Environment Variables</h2>
+    <p>Copy <code>.env.example</code> to <code>.env</code> and fill in your values.</p>
+
+    <table>
+      <tr><th>Variable</th><th>Required</th><th>Description</th></tr>
+      <tr><td><code>PORT</code></td><td>No</td><td>Backend server port. Default: <code>8080</code></td></tr>
+      <tr><td><code>ENV</code></td><td>No</td><td><code>development</code> or <code>production</code></td></tr>
+      <tr><td><code>DATABASE_URL</code></td><td>Yes</td><td>PostgreSQL connection string</td></tr>
+      <tr><td><code>REDIS_URL</code></td><td>Yes</td><td>Redis connection string</td></tr>
+      <tr><td><code>JWT_SECRET</code></td><td>Yes</td><td>JWT signing secret (long random string)</td></tr>
+      <tr><td><code>OPENAI_API_KEY</code></td><td>One required</td><td>OpenAI key for AI features</td></tr>
+      <tr><td><code>GEMINI_API_KEY</code></td><td>One required</td><td>Google Gemini key for AI features</td></tr>
+      <tr><td><code>R2_BUCKET</code></td><td>Yes</td><td>Cloudflare R2 bucket name</td></tr>
+      <tr><td><code>R2_ACCOUNT_ID</code></td><td>Yes</td><td>Cloudflare account ID</td></tr>
+      <tr><td><code>R2_ACCESS_KEY_ID</code></td><td>Yes</td><td>R2 access key</td></tr>
+      <tr><td><code>R2_SECRET_ACCESS_KEY</code></td><td>Yes</td><td>R2 secret key</td></tr>
+      <tr><td><code>R2_PUBLIC_URL</code></td><td>No</td><td>Public CDN URL for R2 assets</td></tr>
+      <tr><td><code>NEXT_PUBLIC_API_URL</code></td><td>Yes</td><td>Backend API URL visible to browser</td></tr>
+    </table>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════ DEPLOYMENT -->
+  <section id="deployment">
+    <h2>Deployment</h2>
+    <p>Declutr is designed for simple, affordable cloud deployment. No Kubernetes. No Helm. No Terraform.</p>
+
+    <h3>Recommended Stack</h3>
+    <div class="card-grid">
+      <div class="card"><div class="card-title">Backend</div><div class="card-desc">Railway · Render · Fly.io</div></div>
+      <div class="card"><div class="card-title">Frontend</div><div class="card-desc">Vercel · Netlify</div></div>
+      <div class="card"><div class="card-title">Database</div><div class="card-desc">Supabase · Neon (Postgres)</div></div>
+      <div class="card"><div class="card-title">Storage</div><div class="card-desc">Cloudflare R2</div></div>
+      <div class="card"><div class="card-title">Cache</div><div class="card-desc">Upstash Redis</div></div>
+    </div>
+
+    <h3>Deploy Backend to Railway</h3>
+    <pre>railway login
+railway link
+railway up</pre>
+
+    <h3>Deploy Frontend to Vercel</h3>
+    <pre>cd frontend
+vercel deploy --prod</pre>
+
+    <h3>Local Development (Docker)</h3>
+    <pre>docker compose up   # Starts Postgres + Redis + Backend + Frontend</pre>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════ QUICKSTART -->
+  <section id="quickstart">
+    <h2>Quick Start</h2>
+    <pre>git clone https://github.com/lakshhchopra/declutr.git
+cd declutr
+
+# 1. Set up environment
+cp .env.example .env
+# Edit .env with your API keys
+
+# 2. Start database + cache
+docker compose up -d db redis
+
+# 3. Run backend
+cd backend
+go run cmd/server/main.go
+
+# 4. Run frontend (new terminal)
+cd frontend
+npm install
+npm run dev
+
+# App → http://localhost:3000
+# API → http://localhost:8080</pre>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════ ROADMAP -->
+  <section id="roadmap">
+    <h2>Roadmap</h2>
+
+    <div class="roadmap-item"><div class="roadmap-dot dot-done"></div><div><div class="roadmap-title">v1 — Core Vault & Auth</div><div class="roadmap-desc">Zero-knowledge SRP auth, encrypted asset storage, multi-format upload</div></div></div>
+    <div class="roadmap-item"><div class="roadmap-dot dot-done"></div><div><div class="roadmap-title">v1 — Hybrid Search & Embeddings</div><div class="roadmap-desc">Vector embeddings, BM25 + semantic hybrid search, RRF fusion</div></div></div>
+    <div class="roadmap-item"><div class="roadmap-dot dot-done"></div><div><div class="roadmap-title">v1 — Grounded AI Copilot</div><div class="roadmap-desc">RAG-powered chat with citations, streaming, feedback</div></div></div>
+    <div class="roadmap-item"><div class="roadmap-dot dot-done"></div><div><div class="roadmap-title">v1 — Memory & Persona</div><div class="roadmap-desc">Episodic memory engine, reverse persona modeling, context detection</div></div></div>
+    <div class="roadmap-item"><div class="roadmap-dot dot-done"></div><div><div class="roadmap-title">v1 — Workflow & Notifications</div><div class="roadmap-desc">Automation rule engine, proactive notification center</div></div></div>
+    <div class="roadmap-item"><div class="roadmap-dot dot-done"></div><div><div class="roadmap-title">v1 — Collaboration & Security</div><div class="roadmap-desc">Granular sharing, audit log, risk assessment, trusted devices</div></div></div>
+    <div class="roadmap-item"><div class="roadmap-dot dot-done"></div><div><div class="roadmap-title">v1 — Sync, Versioning & Backup</div><div class="roadmap-desc">Offline-first sync, conflict resolution, version history, disaster recovery</div></div></div>
+    <div class="roadmap-item"><div class="roadmap-dot dot-done"></div><div><div class="roadmap-title">v1 — Integrations Platform</div><div class="roadmap-desc">Google Drive, Notion, GitHub, Dropbox, Slack connectors</div></div></div>
+    <div class="roadmap-item"><div class="roadmap-dot dot-done"></div><div><div class="roadmap-title">v1 — Organizations & Multi-Tenancy</div><div class="roadmap-desc">Enterprise workspaces, RBAC, SSO, directory sync</div></div></div>
+    <div class="roadmap-item"><div class="roadmap-dot dot-done"></div><div><div class="roadmap-title">v1 — Developer Platform</div><div class="roadmap-desc">Public REST API, API keys, Webhooks, OAuth2, OpenAPI spec</div></div></div>
+    <div class="roadmap-item"><div class="roadmap-dot dot-done"></div><div><div class="roadmap-title">v1 — Extension Marketplace</div><div class="roadmap-desc">Sandboxed extension runtime, versioning, publisher review flow</div></div></div>
+    <div class="roadmap-item"><div class="roadmap-dot dot-done"></div><div><div class="roadmap-title">v1.0.0 GA — Release Candidate & Launch</div><div class="roadmap-desc">Full system validation, production hardening, public launch</div></div></div>
+    <div class="roadmap-item"><div class="roadmap-dot dot-done"></div><div><div class="roadmap-title">v2 — Autonomous Agent Platform</div><div class="roadmap-desc">8 agent types, planning engine, reasoning engine, human approval gates</div></div></div>
+    <div class="roadmap-item"><div class="roadmap-dot dot-done"></div><div><div class="roadmap-title">v2 — Multi-Agent Intelligence System</div><div class="roadmap-desc">13 specialist agents, coordinator, message bus, DAG task planner</div></div></div>
+    <div class="roadmap-item"><div class="roadmap-dot dot-done"></div><div><div class="roadmap-title">v2 — Predictive Intelligence Engine</div><div class="roadmap-desc">16 proactive prediction types, feedback learning, life intelligence feed</div></div></div>
+    <div class="roadmap-item"><div class="roadmap-dot dot-done"></div><div><div class="roadmap-title">v2 — Life Operating System (LifeOS)</div><div class="roadmap-desc">Life Areas, Projects, Goals, unified dashboard, life timeline, life metrics</div></div></div>
+    <div class="roadmap-item"><div class="roadmap-dot dot-open"></div><div><div class="roadmap-title">v2 — Native Desktop App</div><div class="roadmap-desc">Electron or Tauri desktop client with offline vault</div></div></div>
+    <div class="roadmap-item"><div class="roadmap-dot dot-open"></div><div><div class="roadmap-title">v2 — Self-Hosted One-Click Deployment</div><div class="roadmap-desc">Single Docker image, Coolify/Caprover templates</div></div></div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════ PROGRESS -->
+  <section id="progress">
+    <h2>Current Progress</h2>
+    <p>Declutr v2 is feature-complete across all 40 engineering milestones (Issues #001–#040).</p>
+
+    <table>
+      <tr><th>Area</th><th>Status</th></tr>
+      <tr><td>Zero-knowledge auth (SRP)</td><td><span class="badge badge-green">Complete</span></td></tr>
+      <tr><td>Encrypted vault + asset storage</td><td><span class="badge badge-green">Complete</span></td></tr>
+      <tr><td>Hybrid semantic search + embeddings</td><td><span class="badge badge-green">Complete</span></td></tr>
+      <tr><td>Grounded AI Copilot (RAG)</td><td><span class="badge badge-green">Complete</span></td></tr>
+      <tr><td>Memory + Persona engines</td><td><span class="badge badge-green">Complete</span></td></tr>
+      <tr><td>Workflow automation</td><td><span class="badge badge-green">Complete</span></td></tr>
+      <tr><td>Collaboration + sharing</td><td><span class="badge badge-green">Complete</span></td></tr>
+      <tr><td>Versioning + backup</td><td><span class="badge badge-green">Complete</span></td></tr>
+      <tr><td>Offline sync</td><td><span class="badge badge-green">Complete</span></td></tr>
+      <tr><td>External integrations</td><td><span class="badge badge-green">Complete</span></td></tr>
+      <tr><td>Organizations + RBAC</td><td><span class="badge badge-green">Complete</span></td></tr>
+      <tr><td>Developer platform (API/Webhooks)</td><td><span class="badge badge-green">Complete</span></td></tr>
+      <tr><td>Extension marketplace</td><td><span class="badge badge-green">Complete</span></td></tr>
+      <tr><td>Autonomous agents</td><td><span class="badge badge-green">Complete</span></td></tr>
+      <tr><td>Multi-agent coordinator</td><td><span class="badge badge-green">Complete</span></td></tr>
+      <tr><td>Predictive intelligence (16 types)</td><td><span class="badge badge-green">Complete</span></td></tr>
+      <tr><td>Life Operating System (LifeOS)</td><td><span class="badge badge-green">Complete</span></td></tr>
+      <tr><td>Repository refactor & DX</td><td><span class="badge badge-green">Complete</span></td></tr>
+    </table>
+  </section>
+
+</main>
+
+<script>
+  // Highlight active sidebar link on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const links = document.querySelectorAll('#sidebar a');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const a = document.querySelector(`#sidebar a[href="#${e.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>

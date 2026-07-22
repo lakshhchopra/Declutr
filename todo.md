@@ -396,6 +396,20 @@ This document tracks the comprehensive roadmap and action items to complete the 
 - [x] LifeOS Go Test Suite (`backend/tests/lifeos_test.go`)
 - [x] LifeOS Documentation Suite (`docs/lifeos/`)
 
+---
+
+## 🧹 Phase 17: Repository Refactoring & Developer Experience (Complete)
+- [x] Consolidated 34 database migrations → 10 domain-grouped migrations (`001`–`010`)
+- [x] Removed enterprise over-engineering (`infrastructure/kubernetes/`, `helm/`, `terraform/`, `monitoring/`)
+- [x] Removed 18 redundant markdown documentation subdirectories under `docs/`
+- [x] Removed root-level `security/`, `tests/`, `sdks/ruby`, `sdks/python`, `sdks/go`
+- [x] Rewrote `README.md` for 30-minute developer onboarding
+- [x] Created interactive `docs/declutr_architecture_document.html` as single source of truth
+- [x] Created clean `docker-compose.yml` for one-command local dev
+- [x] Rewrote `.env.example` with inline documentation
+- [x] Updated `current.md` and `todo.md`
+
+
 
 
 
