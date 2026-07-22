@@ -1345,6 +1345,51 @@ User Goals → Agent Registry → Planning Engine → Reasoning Engine → Tool 
 | `POST` | `/api/v1/agents/plans/reject` | Reject proposed plan step |
 | `GET` | `/api/v1/agents/memory` | Retrieve operational agent memory |
 
+---
+
+## 👥 Multi-Agent Intelligence Platform
+
+Declutr's Multi-Agent Intelligence System coordinates specialized AI agents that collaborate to solve complex multi-domain goals.
+
+### System Architecture & Pipeline
+
+```
+User Goal → Coordinator Agent → Task Planner → Specialist Agents → Shared Memory → Execution → Consensus Review → Response
+```
+
+### Key Capabilities
+
+- **13 Specialist Agent Roles**: `COORDINATOR`, `KNOWLEDGE`, `MEMORY`, `RESEARCH`, `ORGANIZATION`, `WORKFLOW`, `SEARCH`, `SECURITY`, `INTEGRATION`, `TIMELINE`, `FINANCIAL`, `TRAVEL`, `LEARNING`.
+- **Event-Driven Structured Message Bus**: `MessageBus` (`backend/modules/multiagent/application/bus.go`) routes structured messages containing `Sender`, `Receiver`, `TaskID`, `GoalID`, `Payload`, `Context`, `Timestamp`, `CorrelationID`. Direct calls or raw prompt exchanges are forbidden.
+- **DAG Task Planner**: `MultiAgentTaskPlanner` (`backend/modules/multiagent/application/planner.go`) constructs DAG task execution graphs supporting parallel and sequential execution nodes, dependencies, retries, and approval checkpoints.
+- **Coordinator Agent**: `CoordinatorAgent` (`backend/modules/multiagent/application/coordinator.go`) manages goal decomposition, task assignment, progress tracking, parallel result merging, and consensus conflict resolution.
+- **Consensus & Conflict Resolution**: Evaluates conflicting specialist outputs based on confidence scores and evidence rationales, escalating to human review if consensus threshold is not met.
+- **Web & Mobile Portals**: `/multiagent` (Dashboard, Coordinator View, Task Graph Visualizer, Message Bus Monitor, Agent Health Grid), and React Native mobile components.
+
+### Database Schema (Migration 032)
+
+| Table | Purpose |
+|---|---|
+| `agent_registry` | Registered specialist agent capabilities, supported tools, and health statuses |
+| `agent_tasks` | Coordinator task graph steps, dependencies, and execution modes |
+| `agent_messages` | Structured Message Bus audit logs and correlation IDs |
+| `agent_executions` | Multi-agent execution telemetry logs |
+| `agent_memory` | Shared multi-agent memory workspace items |
+| `agent_health` | Specialist agent health metrics, latencies, and success rates |
+| `agent_capabilities` | Specialist capability mapping |
+
+### REST API
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/v1/multiagent/goals` | Submit goal to Coordinator Agent for orchestration |
+| `GET` | `/api/v1/multiagent/agents` | List registered specialist agents |
+| `POST` | `/api/v1/multiagent/agents/register` | Register new specialist agent capability |
+| `GET` | `/api/v1/multiagent/messages` | Retrieve Message Bus audit history |
+| `GET` | `/api/v1/multiagent/tasks` | Get task graph execution status |
+| `GET` | `/api/v1/multiagent/health` | Get specialist agent health metrics |
+
+
 
 
 

@@ -43,6 +43,9 @@ import (
 	memoryApp "github.com/diablovocado/declutr/modules/memory/application"
 	memoryRepository "github.com/diablovocado/declutr/modules/memory/repository"
 	memoryTransport "github.com/diablovocado/declutr/modules/memory/transport"
+	multiagentApp "github.com/diablovocado/declutr/modules/multiagent/application"
+	multiagentRepository "github.com/diablovocado/declutr/modules/multiagent/repository"
+	multiagentTransport "github.com/diablovocado/declutr/modules/multiagent/transport"
 	notificationApp "github.com/diablovocado/declutr/modules/notification/application"
 	notificationRepository "github.com/diablovocado/declutr/modules/notification/repository"
 	notificationTransport "github.com/diablovocado/declutr/modules/notification/transport"
@@ -79,7 +82,7 @@ import (
 func main() {
 	cfg := config.LoadConfig()
 	logger := observability.InitLogger("declutr-backend", nil)
-	logger.Info(context.Background(), "Starting Declutr v2 Autonomous Agent Platform Backend Engine", map[string]interface{}{
+	logger.Info(context.Background(), "Starting Declutr Multi-Agent Intelligence Engine", map[string]interface{}{
 		"env":  cfg.Env,
 		"port": cfg.Port,
 	})
@@ -97,6 +100,17 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
+
+	// Multi-Agent Intelligence Platform Initialization
+	multiRepo := multiagentRepository.NewInMemoryMultiAgentRepository()
+	multiSvc := multiagentApp.NewMultiAgentService(multiRepo)
+	multiAPI := multiagentTransport.NewMultiAgentAPI(multiSvc)
+
+	mux.HandleFunc("/api/v1/multiagent/goals", multiAPI.ProcessGoal)
+	mux.HandleFunc("/api/v1/multiagent/agents", multiAPI.ListAgents)
+	mux.HandleFunc("/api/v1/multiagent/messages", multiAPI.GetMessages)
+	mux.HandleFunc("/api/v1/multiagent/tasks", multiAPI.GetTaskGraph)
+	mux.HandleFunc("/api/v1/multiagent/health", multiAPI.GetHealth)
 
 	// Autonomous Knowledge Agent Platform (Declutr Intelligence v2)
 	agentRepo := agentRepository.NewInMemoryAgentRepository()
@@ -609,7 +623,7 @@ func main() {
 		IdleTimeout:  60 * time.Second,
 	}
 
-	log.Printf("Declutr v2 Autonomous Agent Backend Platform Running on :%s (Environment: %s)", cfg.Port, cfg.Env)
+	log.Printf("Declutr Multi-Agent Intelligence Platform Running on :%s (Environment: %s)", cfg.Port, cfg.Env)
 
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("Server startup failed: %v", err)

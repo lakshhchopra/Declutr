@@ -44,6 +44,18 @@ Declutr is structured as a production-grade modular monorepo:
 
 ## 📜 Dev History (Commit Log Summary)
 
+- **Multi-Agent Intelligence Platform (Issue #038)**:
+  - Implemented Multi-Agent Domain models (`backend/modules/multiagent/domain/multiagent.go`) for `AgentRegistration`, `CoordinatorTask`, `AgentMessage`, `TaskGraph`, `SharedMemoryItem`, `AgentHealthMetric`, `ConsensusResult`, 13 Specialist Agent Roles (`COORDINATOR`, `KNOWLEDGE`, `MEMORY`, `RESEARCH`, `ORGANIZATION`, `WORKFLOW`, `SEARCH`, `SECURITY`, `INTEGRATION`, `TIMELINE`, `FINANCIAL`, `TRAVEL`, `LEARNING`).
+  - Built Event-Driven `MessageBus` (`backend/modules/multiagent/application/bus.go`) routing structured messages with correlation ID tracking and audit logging.
+  - Built `MultiAgentTaskPlanner` (`backend/modules/multiagent/application/planner.go`) constructing DAG task execution graphs with parallel & sequential execution nodes.
+  - Built `CoordinatorAgent` (`backend/modules/multiagent/application/coordinator.go`) orchestrating goal decomposition, specialist agent dispatch, progress tracking, parallel response merging, retries, and consensus evaluation.
+  - Added REST API endpoints (`/api/v1/multiagent/goals`, `/agents`, `/register`, `/disable`, `/tasks`, `/messages`, `/health`).
+  - Created PostgreSQL database migration `database/migrations/032_create_multi_agent_tables.sql` (`agent_registry`, `agent_tasks`, `agent_messages`, `agent_executions`, `agent_memory`, `agent_health`, `agent_capabilities`).
+  - Built Web Multi-Agent Portal (`frontend/app/multiagent/page.tsx`, `frontend/features/multiagent/components/`) featuring `MultiAgentDashboardComponent`, `CoordinatorViewComponent`, `TaskGraphVisualizerComponent`, `MessageBusMonitorComponent`, and `AgentHealthGridComponent`.
+  - Built Mobile Multi-Agent components (`frontend/declutr-mobile/features/multiagent/components/`): `MultiAgentOverview.tsx`, `TaskGraphList.tsx`, `MessageLogList.tsx`.
+  - Created Go test suite (`backend/tests/multiagent_test.go`) validating coordinator goal orchestration, parallel specialist execution, structured message routing, shared memory read/write, and consensus conflict resolution.
+  - Created Multi-Agent Documentation suite (`docs/multiagent/`): `coordinator_guide.md`, `communication_protocol.md`, `task_planner_guide.md`, `consensus_resolution.md`, `shared_memory_guide.md`.
+
 - **Autonomous Knowledge Agent Platform (Declutr Intelligence v2) (Issue #037)**:
   - Implemented Autonomous Agent Core Domain models (`backend/modules/agent/domain/agent.go`) for `Agent`, `AgentGoal`, `AgentPlan`, `AgentTask`, `AgentMemory`, `AgentFeedback`, `AgentExecution`, `AgentPermission`, 8 Agent Types (`KNOWLEDGE`, `RESEARCH`, `ORGANIZATION`, `DOCUMENT`, `FINANCIAL`, `TRAVEL`, `LEARNING`, `COMPLIANCE`), and 5 Execution Modes (`MANUAL_APPROVAL`, `AUTOMATIC`, `SCHEDULED`, `EVENT_DRIVEN`, `GOAL_DRIVEN`).
   - Built `PlanningEngine` (`backend/modules/agent/application/planner.go`) converting persistent goals into multi-step plan task graphs with dependencies, retries, and approval checkpoints.
