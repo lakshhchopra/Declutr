@@ -164,6 +164,16 @@ This document tracks the comprehensive roadmap and action items to complete the 
   - 8 REST API endpoints (versions, snapshot, compare, restore, recyclebin, restore, purge, stats)
   - Web UI: VersionHistoryPanel, DiffViewer, RecycleBin, `/versioning` page route
   - Mobile UI: VersionList, VersionDetail, RecycleBin
+- [x] Backup, Disaster Recovery & Business Continuity:
+  - Database migration `023_create_backup_tables.sql` (7 tables: backups, backup_jobs, backup_files, backup_manifests, backup_history, restore_jobs, restore_history)
+  - Backup Types (MANUAL, SCHEDULED, INCREMENTAL, FULL, ENCRYPTED, OFFLINE, COLD_STORAGE)
+  - Full Vault Snapshot Engine (Assets, Metadata, AI Analysis, Entities, Memories, Workflows, Settings, Logs)
+  - Automated Backup Scheduler (DAILY, WEEKLY, MONTHLY, CUSTOM_CRON) with retention policies
+  - SHA-256 Checksum & Manifest Integrity Verification Engine
+  - Disaster Recovery Restore Engine with scopes (FULL_VAULT, SELECTIVE) and strategies (OVERWRITE, NEW_VAULT, MERGE, DRY_RUN)
+  - 8 REST API endpoints (backups, detail, schedule, restore, verify, cancel, stats)
+  - Web UI: BackupDashboard, RestoreWizard, BackupHistory, `/backup` page route
+  - Mobile UI: BackupStatus, RestoreHistory, ManualBackup
   - 6/6 Go tests passing
 - [x] Reverse Persona Engine:
   - [x] Collect user interaction signals (ASSET_OPEN, SEARCH, PIN, UPLOAD, EDIT, CONTEXT_SWITCH, RELATIONSHIP_EXPLORE, COLLECTION_USE, TIME_OF_DAY, SEARCH_REFINEMENT, DASHBOARD_USAGE, FAVOURITE)

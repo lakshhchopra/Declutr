@@ -902,6 +902,47 @@ Declutr's Version History & Recovery System ("Time Machine") captures immutable 
 | `DELETE` | `/api/v1/recyclebin/purge` | Permanently purge soft-deleted item(s) |
 | `GET` | `/api/v1/versions/stats` | Vault versioning & time machine metrics |
 
+---
+
+## 📦 Backup, Disaster Recovery & Business Continuity
+
+Declutr's Backup & Disaster Recovery System protects the entire Vault from catastrophic data loss across personal and enterprise deployments using encrypted full/incremental snapshots, automated retention schedules, SHA-256 integrity validation, and catastrophe recovery.
+
+> **Architecture**: `Vault` → `Backup Scheduler` → `Snapshot Engine` → `Backup Storage` → `Integrity Verification` → `Recovery Manager` → `Restore`
+
+### Backup Types & Disaster Recovery Modes
+
+- **Backup Types**: `MANUAL`, `SCHEDULED`, `INCREMENTAL`, `FULL`, `ENCRYPTED`, `OFFLINE`, `COLD_STORAGE`.
+- **Content Scope**: Assets, Metadata, AI Analysis, Entities, Relationships, Contexts, Memories, Embeddings, Workflows, Notifications, Preferences, Vault Settings, Version History, Audit Logs.
+- **Recovery Scopes**: `FULL_VAULT`, `SELECTIVE`, `ASSETS_ONLY`, `METADATA_ONLY`, `AI_STATE_ONLY`, `WORKFLOWS_ONLY`, `SETTINGS_ONLY`.
+- **Merge Strategies**: `OVERWRITE_EXISTING`, `RESTORE_AS_NEW_VAULT`, `MERGE_RESTORE`, `DRY_RUN`.
+
+### Database Schema (Migration 023)
+
+| Table | Purpose |
+|---|---|
+| `backups` | Core backup package records, types, size, checksums |
+| `backup_jobs` | Tracking background backup, restore, and integrity validation jobs |
+| `backup_files` | Individual files inside backup payload |
+| `backup_manifests` | Manifest data tracking vault contents, total assets, memories, workflows |
+| `backup_history` | Audit log of backup creation, verification, and purging events |
+| `restore_jobs` | Tracking disaster recovery execution jobs and recovery mode |
+| `restore_history` | Audit log of disaster recovery restores |
+
+### REST API
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/v1/backups` | Create manual snapshot backup |
+| `GET` | `/api/v1/backups` | List backups for vault |
+| `GET` | `/api/v1/backups/detail` | Get backup details and manifest |
+| `POST` | `/api/v1/backups/schedule` | Configure automated backup schedule & retention policy |
+| `POST` | `/api/v1/backups/restore` | Trigger disaster recovery vault restoration |
+| `POST` | `/api/v1/backups/verify` | Verify backup SHA-256 checksum & manifest integrity |
+| `POST` | `/api/v1/backups/cancel` | Cancel active backup or restore job |
+| `GET` | `/api/v1/backups/stats` | Vault backup & disaster recovery stats |
+
+
 
 
 

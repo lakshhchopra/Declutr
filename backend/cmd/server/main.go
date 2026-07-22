@@ -7,6 +7,9 @@ import (
 	"github.com/diablovocado/declutr/modules/auth/application"
 	"github.com/diablovocado/declutr/modules/auth/repository"
 	"github.com/diablovocado/declutr/modules/auth/transport"
+	backupApp "github.com/diablovocado/declutr/modules/backup/application"
+	backupRepository "github.com/diablovocado/declutr/modules/backup/repository"
+	backupTransport "github.com/diablovocado/declutr/modules/backup/transport"
 	collaborationApp "github.com/diablovocado/declutr/modules/collaboration/application"
 	collaborationRepository "github.com/diablovocado/declutr/modules/collaboration/repository"
 	collaborationTransport "github.com/diablovocado/declutr/modules/collaboration/transport"
@@ -343,6 +346,28 @@ func main() {
 	http.HandleFunc("/api/v1/recyclebin/restore", versioningAPI.RestoreRecycleItem)
 	http.HandleFunc("/api/v1/recyclebin/purge", versioningAPI.PurgeRecycleItem)
 	http.HandleFunc("/api/v1/versions/stats", versioningAPI.GetStats)
+
+	// Backup, Disaster Recovery & Business Continuity Module initialization
+	// Pipeline: Vault → Backup Scheduler → Snapshot Engine → Backup Storage → Integrity Verification → Recovery Manager → Restore
+	backupRepo := backupRepository.NewInMemoryBackupRepository()
+	backupSvc := backupApp.NewBackupService(backupRepo)
+	disasterRecoveryEngine := backupApp.NewDisasterRecoveryEngine(backupSvc)
+	_ = disasterRecoveryEngine // available for scheduled automated backups
+	backupAPI := backupTransport.NewBackupAPI(backupSvc)
+
+	http.HandleFunc("/api/v1/backups", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			backupAPI.CreateBackup(w, r)
+		} else {
+			backupAPI.ListBackups(w, r)
+		}
+	})
+	http.HandleFunc("/api/v1/backups/detail", backupAPI.GetBackupDetails)
+	http.HandleFunc("/api/v1/backups/schedule", backupAPI.ConfigureSchedule)
+	http.HandleFunc("/api/v1/backups/restore", backupAPI.RestoreBackup)
+	http.HandleFunc("/api/v1/backups/verify", backupAPI.VerifyIntegrity)
+	http.HandleFunc("/api/v1/backups/cancel", backupAPI.CancelJob)
+	http.HandleFunc("/api/v1/backups/stats", backupAPI.GetStats)
 
 	log.Println("Declutr Backend Running on :8080")
 

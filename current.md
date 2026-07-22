@@ -41,6 +41,15 @@ Declutr is structured as a production-grade modular monorepo:
 
 ## 📜 Dev History (Commit Log Summary)
 
+- **Backup, Disaster Recovery & Business Continuity (Issue #027)**:
+  - Created PostgreSQL database migration `database/migrations/023_create_backup_tables.sql` (`backups`, `backup_jobs`, `backup_files`, `backup_manifests`, `backup_history`, `restore_jobs`, `restore_history`).
+  - Implemented domain models for `Backup`, `BackupJob`, `BackupManifest`, `BackupSchedule`, `RestoreJob`, `BackupStats`, `CreateBackupRequest`, `ScheduleBackupRequest`, `RestoreBackupRequest`, `VerifyBackupRequest`.
+  - Built `BackupService` & `DisasterRecoveryEngine` managing encrypted full & incremental snapshot backups, automated scheduler policies (`DAILY`, `WEEKLY`, `MONTHLY`), SHA-256 integrity validation, and catastrophe recovery with customizable restore modes (`FULL_VAULT`, `SELECTIVE`) and strategies (`OVERWRITE_EXISTING`, `RESTORE_AS_NEW_VAULT`, `MERGE_RESTORE`, `DRY_RUN`).
+  - Added 8 REST API endpoints (`POST /backups`, `GET /backups`, `GET /backups/detail`, `POST /backups/schedule`, `POST /backups/restore`, `POST /backups/verify`, `POST /backups/cancel`, `GET /backups/stats`).
+  - Created Web UI module (`frontend/features/backup/components/`) featuring `BackupDashboard`, `RestoreWizard`, `BackupHistory`, and Next.js page route (`/backup`).
+  - Created Mobile UI components (`frontend/declutr-mobile/features/backup/components/`): `BackupStatus.tsx`, `RestoreHistory.tsx`, `ManualBackup.tsx`.
+  - Added comprehensive Go test suite (`backup_test.go`) — 6/6 tests passing: Create Manual Backup, Backup Schedule Policy, Integrity Verification, Disaster Recovery Restore, Cancel Backup Job, Backup Stats.
+
 - **Version History, Recovery & Time Machine (Issue #026)**:
   - Created PostgreSQL database migration `database/migrations/022_create_versioning_tables.sql` (`resource_versions`, `version_snapshots`, `change_history`, `recycle_bin`, `restore_jobs`, `version_diffs`).
   - Implemented domain models for `ResourceVersion`, `VersionSnapshot`, `RecycleItem`, `VersionDiff`, `VersioningStats`, `CreateSnapshotRequest`, `CompareVersionsRequest`, `RestoreVersionRequest`.
