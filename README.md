@@ -1432,6 +1432,53 @@ Knowledge Graph → Memory Engine → Timeline → Reverse Persona → Predictiv
 | `PUT` | `/api/v1/predictive/settings` | Update user prediction settings |
 | `GET` | `/api/v1/predictive/stats` | Retrieve prediction telemetry stats (accuracy, acceptance rate) |
 
+---
+
+## 🧭 Life Operating System (LifeOS)
+
+Declutr's LifeOS transforms the platform from a document manager into an operating system for digital life.
+
+### Hierarchy & Model
+
+```
+Life Area → Projects → Goals → Contexts → Knowledge → Assets
+```
+
+### Key Capabilities
+
+- **12 Default Life Areas + Custom Areas**: `Personal`, `Work`, `Business`, `Education`, `Finance`, `Health`, `Travel`, `Legal`, `Home`, `Family`, `Research`, `Hobbies`.
+- **First-Class Project Engine**: `ProjectEngine` (`backend/modules/lifeos/application/project_engine.go`) manages project hubs ("Launch Startup", "Japan Trip", "Semester 6", "Tax Filing 2027") containing knowledge, documents, timeline, AI chat, workflows, people, goals, and budgets.
+- **Goal Engine & Progress Tracker**: `GoalEngine` (`backend/modules/lifeos/application/goal_engine.go`) tracks project milestone goals ("Renew Passport", "Submit Assignment") with progress %, missing asset detection, and AI recommendations.
+- **Life Graph Engine**: `LifeGraphEngine` (`backend/modules/lifeos/application/graph.go`) links Life Areas → Projects → Goals → Contexts → Entities → Knowledge → Assets.
+- **Unified Life Dashboard & Life Timeline**: Redesigned home interface combining Today's Priorities, Life Areas, Project Hub, Goal Tracker, Unified Life Timeline, and Life Health metrics.
+- **Web & Mobile Portals**: `/lifeos` (Dashboard, Life Area Grid, Project Hub, Goal Tracker, Life Timeline), and React Native mobile components.
+
+### Database Schema (Migration 034)
+
+| Table | Purpose |
+|---|---|
+| `life_areas` | Registered top-level life domains and icon mappings |
+| `projects` | First-class project hubs, budgets, people, and target dates |
+| `project_goals` | Milestone goals belonging to projects, progress %, and missing assets |
+| `goal_progress` | Historical log of goal completion percentage updates |
+| `life_dashboard` | Unified LifeOS home view configuration and health scores |
+| `life_metrics` | Life balance telemetry metrics (active projects, completion rates) |
+
+### REST API
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/v1/lifeos/dashboard` | Retrieve unified LifeOS dashboard data |
+| `GET` | `/api/v1/lifeos/areas` | List top-level Life Areas |
+| `GET` | `/api/v1/lifeos/projects` | List active projects |
+| `POST` | `/api/v1/lifeos/projects` | Create new first-class project hub |
+| `GET` | `/api/v1/lifeos/goals` | List project goals |
+| `POST` | `/api/v1/lifeos/goals` | Create new project goal |
+| `POST` | `/api/v1/lifeos/goals/progress` | Update goal completion progress % |
+| `GET` | `/api/v1/lifeos/timeline` | Retrieve unified Life Timeline event stream |
+| `GET` | `/api/v1/lifeos/metrics` | Retrieve life balance telemetry metrics |
+
+
 
 
 

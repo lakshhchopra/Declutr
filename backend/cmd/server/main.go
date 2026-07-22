@@ -40,6 +40,9 @@ import (
 	integrationsApp "github.com/diablovocado/declutr/modules/integrations/application"
 	integrationsRepository "github.com/diablovocado/declutr/modules/integrations/repository"
 	integrationsTransport "github.com/diablovocado/declutr/modules/integrations/transport"
+	lifeosApp "github.com/diablovocado/declutr/modules/lifeos/application"
+	lifeosRepository "github.com/diablovocado/declutr/modules/lifeos/repository"
+	lifeosTransport "github.com/diablovocado/declutr/modules/lifeos/transport"
 	memoryApp "github.com/diablovocado/declutr/modules/memory/application"
 	memoryRepository "github.com/diablovocado/declutr/modules/memory/repository"
 	memoryTransport "github.com/diablovocado/declutr/modules/memory/transport"
@@ -85,7 +88,7 @@ import (
 func main() {
 	cfg := config.LoadConfig()
 	logger := observability.InitLogger("declutr-backend", nil)
-	logger.Info(context.Background(), "Starting Declutr Predictive Life Intelligence Server", map[string]interface{}{
+	logger.Info(context.Background(), "Starting Declutr Life Operating System (LifeOS)", map[string]interface{}{
 		"env":  cfg.Env,
 		"port": cfg.Port,
 	})
@@ -103,6 +106,19 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
+
+	// Life Operating System (LifeOS) Initialization
+	lifeRepo := lifeosRepository.NewInMemoryLifeOSRepository()
+	lifeSvc := lifeosApp.NewLifeOSService(lifeRepo)
+	lifeAPI := lifeosTransport.NewLifeOSAPI(lifeSvc)
+
+	mux.HandleFunc("/api/v1/lifeos/dashboard", lifeAPI.GetDashboard)
+	mux.HandleFunc("/api/v1/lifeos/areas", lifeAPI.ListLifeAreas)
+	mux.HandleFunc("/api/v1/lifeos/projects", lifeAPI.ManageProjects)
+	mux.HandleFunc("/api/v1/lifeos/goals", lifeAPI.ManageGoals)
+	mux.HandleFunc("/api/v1/lifeos/goals/progress", lifeAPI.UpdateGoalProgress)
+	mux.HandleFunc("/api/v1/lifeos/timeline", lifeAPI.GetTimeline)
+	mux.HandleFunc("/api/v1/lifeos/metrics", lifeAPI.GetMetrics)
 
 	// Predictive Intelligence & Life Intelligence Engine Initialization
 	predRepo := predictiveRepository.NewInMemoryPredictiveRepository()
@@ -638,7 +654,7 @@ func main() {
 		IdleTimeout:  60 * time.Second,
 	}
 
-	log.Printf("Declutr Predictive Life Intelligence Engine Running on :%s (Environment: %s)", cfg.Port, cfg.Env)
+	log.Printf("Declutr Life Operating System (LifeOS) Running on :%s (Environment: %s)", cfg.Port, cfg.Env)
 
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("Server startup failed: %v", err)
