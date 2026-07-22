@@ -88,10 +88,18 @@ This document tracks the comprehensive roadmap and action items to complete the 
 ---
 
 ## 🔍 Phase 5: Semantic Retrieval & Persona Intelligence
-- [ ] Add `pgvector` extension support to PostgreSQL migration
-- [ ] Build vector embedding table (`embeddings`)
-- [ ] Embeddings generation pipeline:
-  - Connect text chunks to vector models (e.g. local ONNX embeddings or cloud APIs)
+- [x] Add `pgvector` extension support to PostgreSQL migration (`015_create_embedding_tables.sql`)
+- [x] Build vector embedding tables (`embeddings`, `embedding_chunks`, `embedding_versions`, `embedding_jobs`, `embedding_providers`, `vector_metadata`)
+- [x] Embeddings generation pipeline & Knowledge Representation Layer:
+  - Rich structured representation input (Title + Summary + Content + Entities + Relationships + Contexts + Intent + Memory Score + Tags)
+  - Provider Abstraction: OpenAI, Gemini, Voyage, Cohere, Ollama, Local Deterministic
+  - Vector Store Repository Abstraction: PGVector, Qdrant, Weaviate, Pinecone, Milvus, InMemory
+  - Intelligent Chunking Engine: Semantic, Heading-aware, Page-aware, Hierarchical, Document-aware
+  - Deduplication via SHA-256 content hashes
+  - Model versioning & upgrade re-indexing (`RebuildForVersion`)
+  - Web UI: EmbeddingDashboard, EmbeddingStatus, ModelInformation, GenerationHistory, `/embedding` page route
+  - Mobile UI: EmbeddingStatus, ProcessingProgress
+  - 6/6 Go tests passing
 - [ ] Hybrid Search query processor (`POST /v1/search/query`):
   - Combine traditional PostgreSQL full-text search (keyword) and pgvector semantic distance
 - [x] Reverse Persona Engine:

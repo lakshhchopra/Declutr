@@ -41,6 +41,19 @@ Declutr is structured as a production-grade modular monorepo:
 
 ## 📜 Dev History (Commit Log Summary)
 
+- **Embedding Engine & Knowledge Representation Layer (Issue #019)**:
+  - Created PostgreSQL database migration `database/migrations/015_create_embedding_tables.sql` (`embeddings`, `embedding_chunks`, `embedding_versions`, `embedding_jobs`, `embedding_providers`, `vector_metadata`).
+  - Implemented domain models for `Embedding`, `EmbeddingChunk`, `EmbeddingVersion`, `EmbeddingJob`, `EmbeddingProviderConfig`, `VectorMetadata`, `StructuredRepresentationInput`, `ChunkResult`, `GenerationOptions`, `EmbeddingStats`.
+  - Built Provider Abstraction (`providers/provider.go`) supporting OpenAI, Gemini, Voyage, Cohere, Ollama, and Local deterministic provider.
+  - Built Vendor-Independent Vector Database Repository (`repository/repository.go`) supporting PGVector, Qdrant, Weaviate, Pinecone, Milvus, and thread-safe InMemory driver with Cosine Similarity search.
+  - Built Intelligent Chunking Engine (`chunking/chunker.go`) supporting Semantic, Heading-aware, Page-aware, Hierarchical, and Document-aware strategies.
+  - Built `EmbeddingService` & `EmbeddingEngine` performing rich structured knowledge vectorization, SHA-256 deduplication, incremental refresh, and model version re-indexing (`RebuildForVersion`).
+  - Registered `EmbeddingWorker` into the processing pipeline: `Memory Engine` ↓ `Embedding Engine` ↓ `Vector Storage`.
+  - Added 7 REST API endpoints (`POST /embedding/generate`, `POST /embedding/refresh`, `GET /embedding/status`, `GET /embedding/stats`, `GET /embedding/history`, `PUT /embedding/provider`, `POST /embedding/rebuild`).
+  - Created Web UI module (`frontend/features/embedding/components/`) featuring `EmbeddingDashboard`, `EmbeddingStatus`, `ModelInformation`, `GenerationHistory`, and Next.js page route (`/embedding`).
+  - Created Mobile UI components (`frontend/declutr-mobile/features/embedding/components/`): `EmbeddingStatus.tsx`, `ProcessingProgress.tsx`.
+  - Added comprehensive Go test suite (`embedding_test.go`) — 6/6 tests passing: Structured Embedding Generation, Intelligent Chunking (5 strategies), Provider Switching (6 providers), Vector Store Nearest Search, Incremental Updates, Version Upgrades.
+
 - **Memory Engine & Knowledge Memory Foundation (Issue #018)**:
   - Created PostgreSQL database migration `database/migrations/014_create_memory_tables.sql` (`memories`, `memory_sources`, `memory_scores`, `memory_events`, `memory_history`, `memory_settings`, `memory_clusters`).
   - Implemented domain models for `Memory`, `MemorySource`, `MemoryScore`, `MemoryEvent`, `MemoryHistory`, `MemorySettings`, `MemoryCluster`, `MemoryDetail`, `MemoryStats`, `MemoryFormationRequest`.

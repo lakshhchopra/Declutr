@@ -10,6 +10,9 @@ import (
 	contextApp "github.com/diablovocado/declutr/modules/context/application"
 	contextRepository "github.com/diablovocado/declutr/modules/context/repository"
 	contextTransport "github.com/diablovocado/declutr/modules/context/transport"
+	embeddingApp "github.com/diablovocado/declutr/modules/embedding/application"
+	embeddingRepository "github.com/diablovocado/declutr/modules/embedding/repository"
+	embeddingTransport "github.com/diablovocado/declutr/modules/embedding/transport"
 	memoryApp "github.com/diablovocado/declutr/modules/memory/application"
 	memoryRepository "github.com/diablovocado/declutr/modules/memory/repository"
 	memoryTransport "github.com/diablovocado/declutr/modules/memory/transport"
@@ -122,6 +125,22 @@ func main() {
 			memoryAPI.GetSettings(w, r)
 		}
 	})
+
+	// Embedding Engine Module initialization
+	// Pipeline: Memory Engine → Embedding Engine → Vector Storage
+	embeddingRepo := embeddingRepository.NewInMemoryVectorRepository()
+	embeddingSvc := embeddingApp.NewEmbeddingService(embeddingRepo)
+	embeddingEngine := embeddingApp.NewEmbeddingEngine(embeddingSvc)
+	_ = embeddingEngine // available for worker dispatch
+	embeddingAPI := embeddingTransport.NewEmbeddingAPI(embeddingSvc)
+
+	http.HandleFunc("/api/v1/embedding/generate", embeddingAPI.GenerateEmbedding)
+	http.HandleFunc("/api/v1/embedding/refresh", embeddingAPI.RefreshEmbeddings)
+	http.HandleFunc("/api/v1/embedding/status", embeddingAPI.GetStatus)
+	http.HandleFunc("/api/v1/embedding/stats", embeddingAPI.GetStats)
+	http.HandleFunc("/api/v1/embedding/history", embeddingAPI.GetHistory)
+	http.HandleFunc("/api/v1/embedding/provider", embeddingAPI.UpdateProvider)
+	http.HandleFunc("/api/v1/embedding/rebuild", embeddingAPI.RebuildVersion)
 
 	log.Println("Declutr Backend Running on :8080")
 

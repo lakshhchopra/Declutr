@@ -470,3 +470,84 @@ Recency = e^(−decayRate × daysSinceLastSeen)
 | `DELETE` | `/api/v1/memory` | Permanently delete a memory |
 | `GET` / `PUT` | `/api/v1/memory/settings` | Get / update memory settings |
 
+---
+
+## 💎 Embedding Engine & Knowledge Representation Layer
+
+Declutr's Embedding Engine transforms enriched, structured knowledge into high-quality semantic vector representations. Rather than vectorising raw unformatted text alone, it builds dense vectors from structured representation inputs containing Title, Summary, Content, Entities, Relationships, Contexts, Intent, Memory Scores, Tags, and Classifications.
+
+> **Pipeline Position**: `Metadata` → `Content Extraction` → `AI Analysis` → `Entities` → `Relationships` → `Context` → `Persona` → `Memory` → **`Embedding Engine`** → `Vector Store`
+
+### Rich Structured Knowledge Vectorization
+
+Embeddings are constructed from enriched input representations:
+
+```
+Title: Japan Travel Itinerary 2025
+Summary: Three-week vacation covering Tokyo, Kyoto, and Osaka.
+Classification: Travel Document
+Intent: Vacation Planning
+Contexts: Japan Vacation, Family Trip
+Entities: Tokyo, Kyoto, Narita Airport
+Relationships: Tokyo MENTIONS Narita Airport
+Memory Score: 0.88
+Tags: travel, japan, flights
+```
+
+This maximizes semantic precision while preventing duplicate vectors via SHA-256 content deduplication hashes.
+
+### Provider Abstraction Layer
+
+The engine abstracts model vendors via a unified Go interface:
+
+- **OpenAI**: `text-embedding-3-small` / `text-embedding-3-large` (1536d / 3072d)
+- **Google Gemini**: `text-embedding-004` (768d)
+- **Voyage AI**: `voyage-3-lite` / `voyage-3` (1024d)
+- **Cohere**: `embed-english-v3.0` (1024d)
+- **Ollama**: Local privacy-first open models (`nomic-embed-text`, 768d)
+- **Local Deterministic**: Zero-dependency L2-normalized synthetic vector generator for tests & local dev
+
+### Vendor-Independent Vector Database Repository
+
+Business layers interact with an abstract `VectorStoreRepository` interface, remaining completely decoupled from the vector storage vendor:
+
+- `PGVector` (default PostgreSQL pgvector integration)
+- `Qdrant` · `Weaviate` · `Pinecone` · `Milvus` driver adapters
+- `InMemoryVectorRepository` (thread-safe driver with Cosine Similarity math for unit testing)
+
+### Intelligent Chunking Strategies
+
+Avoids naive fixed-character splits by providing 5 strategy implementations:
+
+| Strategy | Behavior |
+|---|---|
+| `SEMANTIC` | Paragraph & sentence-aware boundary splits |
+| `HEADING_AWARE` | Markdown `#` heading splits with breadcrumb heading path (`# Title > ## Section`) |
+| `PAGE_AWARE` | Page break (`---` / `\f` / `Page N`) splits preserving page numbers |
+| `HIERARCHICAL` | Parent-child hierarchical chunk tree splits |
+| `DOCUMENT_AWARE` | Structured knowledge component boundary splits |
+
+### Database Schema (Migration 015)
+
+| Table | Purpose |
+|---|---|
+| `embeddings` | Core stored vectors, model metadata, content hashes, active status |
+| `embedding_chunks` | Intelligent document chunk vectors, token counts, heading paths |
+| `embedding_versions` | Version & upgrade tracking (`v1.0.0` → `v2.0.0`) |
+| `embedding_jobs` | Background batch vectorization job log |
+| `embedding_providers` | Vault provider configurations & active default models |
+| `vector_metadata` | Key-value tags & attributes linked to vectors |
+
+### REST API
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/v1/embedding/generate` | Generate embedding for a structured representation |
+| `POST` | `/api/v1/embedding/refresh` | Trigger incremental refresh of embeddings |
+| `GET` | `/api/v1/embedding/status` | Check embedding pipeline status & active model |
+| `GET` | `/api/v1/embedding/stats` | Vault embedding & chunk statistics |
+| `GET` | `/api/v1/embedding/history` | Generation job log & model upgrade history |
+| `PUT` | `/api/v1/embedding/provider` | Update provider configuration for vault |
+| `POST` | `/api/v1/embedding/rebuild` | Upgrade model version and re-embed vault items |
+
+
