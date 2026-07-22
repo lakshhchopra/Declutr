@@ -277,4 +277,22 @@ This document tracks the comprehensive roadmap and action items to complete the 
 - [x] Enterprise Test Suite (`backend/tests/organization_test.go`)
 - [x] Enterprise Documentation Suite (`docs/enterprise/`)
 
+---
+
+## 💻 Phase 9: Public API, Developer SDK & Developer Platform (Issue #033 Complete)
+- [x] Versioned REST API (`/api/v1/`) & OpenAPI 3.0 Specification (`docs/developer/openapi.json`)
+- [x] Scoped API Keys (`declutr_live_...`), SHA-256 Hashing, & Key Rotation (`backend/modules/developer/`)
+- [x] OAuth 2.1 PKCE Authorization Code Grant & Token Exchange Engine
+- [x] Webhook Delivery Engine with HMAC-SHA256 Payload Signing (`X-Declutr-Signature`)
+- [x] Webhook Exponential Backoff Retries & Dead Letter Queue (`webhook_dlq`)
+- [x] Official TypeScript SDK (`sdks/typescript/`)
+- [x] Official Go Client SDK (`sdks/go/`)
+- [x] Official Python SDK (`sdks/python/`)
+- [x] Official Declutr CLI Binary (`cli/cmd/declutr/main.go`)
+- [x] Web Developer Portal (`frontend/app/developer/page.tsx`, `frontend/features/developer/components/`)
+- [x] PostgreSQL Migration `029_create_developer_platform_tables.sql`
+- [x] Developer Go Test Suite (`backend/tests/developer_test.go`)
+- [x] Developer Documentation Suite (`docs/developer/`)
+
+
 

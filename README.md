@@ -1155,6 +1155,53 @@ Declutr's Enterprise Organization Platform transforms Declutr into a multi-tenan
 | `GET`/`POST` | `/api/v1/organizations/sso/config` | Get / Configure SSO provider settings |
 | `GET` | `/api/v1/organizations/directory` | Enterprise search directory for members, teams, workspaces |
 
+---
+
+## 💻 Public API, Developer SDK & Developer Platform
+
+Declutr's Developer Platform turns Declutr into an extensible ecosystem where third-party developers, automations, scripts, and AI agents can safely build applications on top of Declutr.
+
+### Platform Features & Components
+
+- **Versioned REST API**: Public `/api/v1/` endpoints with OpenAPI 3.0 specification (`docs/developer/openapi.json`).
+- **Multi-Mode Authentication**: Scoped API Keys (`declutr_live_...`), OAuth 2.1 PKCE, Personal Access Tokens (PATs), and Service Accounts.
+- **Granular API Scopes**: `vault.read`, `vault.write`, `asset.read`, `asset.write`, `workflow.execute`, `ai.chat`, `search.query`, `backup.manage`, `admin.manage`.
+- **Webhook Delivery Engine & DLQ**: Event subscriptions with HMAC-SHA256 signature verification (`X-Declutr-Signature`), 3-stage exponential backoff retries, and Dead Letter Queue (`webhook_dlq`).
+- **Supported Webhook Events**: `asset.uploaded`, `asset.updated`, `context.created`, `workflow.finished`, `backup.completed`, `search.completed`, `memory.created`, `relationship.added`, `user.invited`, `organization.created`.
+- **Official SDKs**:
+  - **TypeScript SDK**: `@declutr/sdk` (`sdks/typescript/`)
+  - **Go Client SDK**: `github.com/diablovocado/declutr/sdks/go` (`sdks/go/`)
+  - **Python SDK**: `declutr-sdk` (`sdks/python/`)
+- **Official Declutr CLI**: Binary (`cli/cmd/declutr/main.go`) supporting `auth`, `vault`, `search`, `upload`, `workflow`, `backup`, `diagnostics`.
+- **Web Developer Portal**: Next.js App router page (`/developer`) featuring `DeveloperDashboardComponent`, `APIKeyManagerComponent`, `WebhookManagerComponent`, `OAuthClientManagerComponent`, `APIExplorerComponent`, and `SDKDownloadComponent`.
+
+### Database Schema (Migration 029)
+
+| Table | Purpose |
+|---|---|
+| `developer_apps` | Registered third-party developer applications |
+| `api_keys` | Scoped API keys with SHA-256 hashed secrets and scope lists |
+| `oauth_clients` | OAuth 2.1 PKCE client app registrations |
+| `oauth_tokens` | Active OAuth access and refresh tokens |
+| `webhooks` | Registered webhook endpoints, URLs, and HMAC signing secrets |
+| `webhook_deliveries` | Webhook HTTP delivery audit logs and latency tracking |
+| `webhook_dlq` | Webhook Dead Letter Queue (DLQ) for failed delivery retries |
+
+### REST API
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/v1/developer/keys` | Generate new scoped API key (secret shown once) |
+| `GET` | `/api/v1/developer/keys` | List developer API keys |
+| `DELETE` | `/api/v1/developer/keys` | Revoke API key |
+| `POST` | `/api/v1/developer/webhooks` | Register new webhook endpoint |
+| `GET` | `/api/v1/developer/webhooks` | List registered webhook endpoints |
+| `GET` | `/api/v1/developer/webhooks/deliveries` | Get webhook delivery logs & DLQ items |
+| `POST` | `/api/v1/developer/oauth/apps` | Register OAuth 2.1 client application |
+| `POST` | `/api/v1/developer/oauth/token` | Exchange OAuth authorization code for token |
+| `GET` | `/api/v1/developer/openapi` | Serve OpenAPI 3.0 Specification JSON |
+
+
 
 
 

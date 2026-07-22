@@ -41,6 +41,17 @@ Declutr is structured as a production-grade modular monorepo:
 
 ## 📜 Dev History (Commit Log Summary)
 
+- **Public API, Developer SDK & Developer Platform (Issue #033)**:
+  - Created PostgreSQL database migration `database/migrations/029_create_developer_platform_tables.sql` (`developer_apps`, `api_keys`, `oauth_clients`, `oauth_tokens`, `webhooks`, `webhook_deliveries`, `webhook_dlq`).
+  - Built Developer Domain models (`backend/modules/developer/domain/developer.go`) for `APIKey`, `OAuthClient`, `OAuthToken`, `WebhookEndpoint`, `WebhookDelivery`, `WebhookDLQItem`, `DeveloperApp`, API Scopes, and Webhook Event Types.
+  - Built `DeveloperService` managing scoped API key generation with SHA-256 secret hashing, key validation, OAuth 2.1 code exchange / token issuance, webhook registration, HMAC-SHA256 signature computation, and Webhook Dispatcher with automated exponential backoff retries and Dead Letter Queue (`webhooks_dlq`).
+  - Added REST API endpoints (`/api/v1/developer/keys`, `/webhooks`, `/webhooks/deliveries`, `/oauth/apps`, `/oauth/token`, `/openapi`).
+  - Built Official Developer SDKs: **TypeScript SDK** (`sdks/typescript/`), **Go SDK** (`sdks/go/`), and **Python SDK** (`sdks/python/`).
+  - Built Official **Declutr CLI** tool binary (`cli/cmd/declutr/main.go`) supporting `auth`, `vault`, `search`, `upload`, `workflow`, `backup`, `diagnostics`.
+  - Created Web Developer Portal (`frontend/app/developer/page.tsx`, `frontend/features/developer/components/`) featuring `DeveloperDashboardComponent`, `APIKeyManagerComponent`, `WebhookManagerComponent`, `OAuthClientManagerComponent`, `APIExplorerComponent`, and `SDKDownloadComponent`.
+  - Created Go test suite (`backend/tests/developer_test.go`) validating API key generation, scope validation, OAuth 2.1 exchange, Webhook HMAC signing & DLQ, and Go SDK client execution.
+  - Created Developer Documentation suite (`docs/developer/`): `openapi.json`, `developer_guide.md`, `sdk_guide.md`, `webhook_guide.md`, `cli_guide.md`.
+
 - **Enterprise Organizations, Multi-Tenancy & Administration (Issue #032)**:
   - Created PostgreSQL database migration `database/migrations/028_create_organization_tables.sql` (`organizations`, `organization_members`, `organization_roles`, `organization_permissions`, `organization_groups`, `organization_group_members`, `organization_policies`, `organization_domains`, `workspace_memberships`, `sso_configurations`).
   - Implemented domain models for `Organization`, `Workspace`, `OrganizationMember`, `OrganizationRole`, `OrganizationPermission`, `OrganizationGroup`, `OrganizationPolicy`, `SSOConfig`, and `OrganizationDirectory` (`backend/modules/organization/domain/organization.go`).

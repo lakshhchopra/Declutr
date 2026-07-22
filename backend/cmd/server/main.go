@@ -22,6 +22,9 @@ import (
 	copilotApp "github.com/diablovocado/declutr/modules/copilot/application"
 	copilotRepository "github.com/diablovocado/declutr/modules/copilot/repository"
 	copilotTransport "github.com/diablovocado/declutr/modules/copilot/transport"
+	devApp "github.com/diablovocado/declutr/modules/developer/application"
+	devRepository "github.com/diablovocado/declutr/modules/developer/repository"
+	devTransport "github.com/diablovocado/declutr/modules/developer/transport"
 	embeddingApp "github.com/diablovocado/declutr/modules/embedding/application"
 	embeddingRepository "github.com/diablovocado/declutr/modules/embedding/repository"
 	embeddingTransport "github.com/diablovocado/declutr/modules/embedding/transport"
@@ -70,7 +73,7 @@ import (
 func main() {
 	cfg := config.LoadConfig()
 	logger := observability.InitLogger("declutr-backend", nil)
-	logger.Info(context.Background(), "Starting Declutr Enterprise Production Backend Platform", map[string]interface{}{
+	logger.Info(context.Background(), "Starting Declutr Developer Platform Backend Engine", map[string]interface{}{
 		"env":  cfg.Env,
 		"port": cfg.Port,
 	})
@@ -88,6 +91,33 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
+
+	// Developer Platform Engine Initialization
+	devRepo := devRepository.NewInMemoryDeveloperRepository()
+	devSvc := devApp.NewDeveloperService(devRepo)
+	devAPI := devTransport.NewDeveloperAPI(devSvc)
+
+	mux.HandleFunc("/api/v1/developer/keys", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			devAPI.CreateAPIKey(w, r)
+		case http.MethodDelete:
+			devAPI.RevokeAPIKey(w, r)
+		default:
+			devAPI.ListAPIKeys(w, r)
+		}
+	})
+	mux.HandleFunc("/api/v1/developer/webhooks", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			devAPI.RegisterWebhook(w, r)
+		} else {
+			devAPI.ListWebhooks(w, r)
+		}
+	})
+	mux.HandleFunc("/api/v1/developer/webhooks/deliveries", devAPI.GetWebhookDeliveries)
+	mux.HandleFunc("/api/v1/developer/oauth/apps", devAPI.CreateOAuthApp)
+	mux.HandleFunc("/api/v1/developer/oauth/token", devAPI.ExchangeOAuthToken)
+	mux.HandleFunc("/api/v1/developer/openapi", devAPI.ServeOpenAPISpec)
 
 	// Enterprise Organizations & Multi-Tenancy Module Initialization
 	orgRepo := orgRepository.NewInMemoryOrganizationRepository()
@@ -535,7 +565,7 @@ func main() {
 		IdleTimeout:  60 * time.Second,
 	}
 
-	log.Printf("Declutr Enterprise Backend Running on :%s (Environment: %s)", cfg.Port, cfg.Env)
+	log.Printf("Declutr Developer Platform Backend Running on :%s (Environment: %s)", cfg.Port, cfg.Env)
 
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("Server startup failed: %v", err)

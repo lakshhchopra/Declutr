@@ -1,0 +1,66 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Declutr Developer Platform Public API",
+    "version": "1.0.0",
+    "description": "Production REST API for Declutr Vaults, Assets, Search, AI Copilot, Workflows, Notifications, Sharing, Version History, Backups, and Webhooks."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080/api/v1",
+      "description": "Local Development Server"
+    }
+  ],
+  "paths": {
+    "/developer/keys": {
+      "get": {
+        "summary": "List API Keys",
+        "tags": ["Developer Platform"],
+        "responses": {
+          "200": { "description": "Success" }
+        }
+      },
+      "post": {
+        "summary": "Generate Scoped API Key",
+        "tags": ["Developer Platform"],
+        "responses": {
+          "201": { "description": "Created" }
+        }
+      }
+    },
+    "/developer/webhooks": {
+      "get": {
+        "summary": "List Registered Webhooks",
+        "tags": ["Developer Platform"],
+        "responses": {
+          "200": { "description": "Success" }
+        }
+      },
+      "post": {
+        "summary": "Register Webhook Endpoint",
+        "tags": ["Developer Platform"],
+        "responses": {
+          "201": { "description": "Created" }
+        }
+      }
+    },
+    "/search/query": {
+      "post": {
+        "summary": "Execute Hybrid Search Query",
+        "tags": ["Search"],
+        "responses": {
+          "200": { "description": "Search Results" }
+        }
+      }
+    },
+    "/copilot/messages": {
+      "post": {
+        "summary": "Send RAG Grounded AI Prompt",
+        "tags": ["AI Copilot"],
+        "responses": {
+          "200": { "description": "Copilot Response" }
+        }
+      }
+    }
+  }
+}
