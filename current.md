@@ -41,6 +41,16 @@ Declutr is structured as a production-grade modular monorepo:
 
 ## 📜 Dev History (Commit Log Summary)
 
+- **Secure Sharing & Collaboration Platform (Issue #025)**:
+  - Created PostgreSQL database migration `database/migrations/021_create_sharing_tables.sql` (`shares`, `share_permissions`, `share_members`, `share_links`, `share_comments`, `share_activity`, `share_invitations`).
+  - Implemented domain models for `Share`, `SharePermission`, `ShareMember`, `ShareLink`, `ShareComment`, `ShareActivity`, `ShareInvitation`, `ShareStats`, `CreateShareRequest`, `InviteRequest`, `CreateLinkRequest`, `AddCommentRequest`.
+  - Built `PermissionEngine` & `PermissionValidationEngine` validating role-based permissions (`READ_ONLY`, `COMMENT_ONLY`, `EDIT`, `OWNER`, `CO_OWNER`) across Assets, Folders, Collections, Contexts, Projects, and Timeline Views.
+  - Built `CollaborationService` implementing share creation, member invitations, password-protected link generation, threaded comments with resolution, and audit trail logging.
+  - Added 11 REST API endpoints (`POST /shares`, `GET /shares`, `DELETE /shares`, `POST /shares/invite`, `POST /shares/invite/accept`, `POST /shares/links`, `POST /shares/links/revoke`, `POST /shares/comments`, `GET /shares/comments`, `GET /shares/activity`, `GET /shares/stats`).
+  - Created Web UI module (`frontend/features/collaboration/components/`) featuring `ShareDialog`, `PermissionManager`, `CommentPanel`, `ActivityFeed`, and Next.js page route (`/collaboration`).
+  - Created Mobile UI components (`frontend/declutr-mobile/features/collaboration/components/`): `ShareSheet.tsx`, `PermissionList.tsx`, `CommentThread.tsx`.
+  - Added comprehensive Go test suite (`collaboration_test.go`) — 6/6 tests passing: Share Creation & Permissions, Invitation Lifecycle, Link Sharing, Threaded Comments, Audit Activity Logging, Revoke Share.
+
 - **Notification Center & Proactive Intelligence (Issue #024)**:
   - Created PostgreSQL database migration `database/migrations/020_create_notification_tables.sql` (`notifications`, `notification_rules`, `notification_preferences`, `notification_delivery`, `notification_history`, `digest_reports`).
   - Implemented domain models for `Notification`, `NotificationPreferences`, `DigestReport`, `NotificationStats`, `MarkReadRequest`, `ActionRequest`.

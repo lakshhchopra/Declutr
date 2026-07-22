@@ -7,6 +7,9 @@ import (
 	"github.com/diablovocado/declutr/modules/auth/application"
 	"github.com/diablovocado/declutr/modules/auth/repository"
 	"github.com/diablovocado/declutr/modules/auth/transport"
+	collaborationApp "github.com/diablovocado/declutr/modules/collaboration/application"
+	collaborationRepository "github.com/diablovocado/declutr/modules/collaboration/repository"
+	collaborationTransport "github.com/diablovocado/declutr/modules/collaboration/transport"
 	contextApp "github.com/diablovocado/declutr/modules/context/application"
 	contextRepository "github.com/diablovocado/declutr/modules/context/repository"
 	contextTransport "github.com/diablovocado/declutr/modules/context/transport"
@@ -282,6 +285,38 @@ func main() {
 		}
 	})
 	http.HandleFunc("/api/v1/notifications/stats", notificationAPI.GetStats)
+
+	// Secure Sharing & Collaboration Platform Module initialization
+	// Pipeline: User → Permission Engine → Share Manager → Access Validation → Audit System → Shared Resource
+	collaborationRepo := collaborationRepository.NewInMemoryCollaborationRepository()
+	collaborationSvc := collaborationApp.NewCollaborationService(collaborationRepo)
+	permissionValidationEngine := collaborationApp.NewPermissionValidationEngine(collaborationSvc)
+	_ = permissionValidationEngine // available for access validation
+	collaborationAPI := collaborationTransport.NewCollaborationAPI(collaborationSvc)
+
+	http.HandleFunc("/api/v1/shares", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			collaborationAPI.CreateShare(w, r)
+		case http.MethodDelete:
+			collaborationAPI.DeleteShare(w, r)
+		default:
+			collaborationAPI.ListShares(w, r)
+		}
+	})
+	http.HandleFunc("/api/v1/shares/invite", collaborationAPI.InviteUser)
+	http.HandleFunc("/api/v1/shares/invite/accept", collaborationAPI.AcceptInvitation)
+	http.HandleFunc("/api/v1/shares/links", collaborationAPI.CreateLink)
+	http.HandleFunc("/api/v1/shares/links/revoke", collaborationAPI.RevokeLink)
+	http.HandleFunc("/api/v1/shares/comments", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			collaborationAPI.AddComment(w, r)
+		} else {
+			collaborationAPI.ListComments(w, r)
+		}
+	})
+	http.HandleFunc("/api/v1/shares/activity", collaborationAPI.GetActivity)
+	http.HandleFunc("/api/v1/shares/stats", collaborationAPI.GetStats)
 
 	log.Println("Declutr Backend Running on :8080")
 

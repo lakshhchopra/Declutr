@@ -820,6 +820,50 @@ Declutr's Notification Center & Proactive Intelligence system delivers contextua
 | `GET` / `PUT` | `/api/v1/notifications/preferences` | Get / update channel preferences and digest frequency |
 | `GET` | `/api/v1/notifications/stats` | Vault notification stats (unread count, urgent count, read rate) |
 
+---
+
+## 🔒 Secure Sharing & Collaboration Platform
+
+Declutr's Secure Sharing & Collaboration Platform enables privacy-first, granular, revocable, and auditable resource sharing across Assets, Folders, Collections, Context Streams, Projects, Timeline Views, and Search Results.
+
+> **Architecture**: `User` → `Permission Engine` → `Share Manager` → `Access Validation` → `Audit System` → `Shared Resource`
+
+### Role Hierarchy & Permissions
+
+- **Member Roles**: `READ_ONLY` (Viewer), `COMMENT_ONLY` (Commenter), `EDIT` (Editor), `OWNER` / `CO_OWNER` (Full Control).
+- **Access Modes**: `PRIVATE`, `INVITE_ONLY`, `LINK_SHARING` (password-protected, expiration, download limits), `TEMPORARY_ACCESS`.
+- **Threaded Discussions**: Inline comments, replies, mentions, and resolution tracking.
+- **Auditable History**: Activity log tracking views, downloads, edits, comments, shares, permission changes, and revocations.
+
+### Database Schema (Migration 021)
+
+| Table | Purpose |
+|---|---|
+| `shares` | Core shared resource container and access settings |
+| `share_permissions` | Role permission matrices (`can_view`, `can_edit`, `can_comment`, `can_share`, `can_manage_members`) |
+| `share_members` | Explicit member email list, roles, and membership expiration |
+| `share_links` | Link sharing tokens, password hashes, view & download limits |
+| `share_comments` | Threaded discussion comments, replies, and resolution state |
+| `share_activity` | Auditable collaboration history log |
+| `share_invitations` | Pending email invitations with accept/reject tokens |
+
+### REST API
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/v1/shares` | Create a shared resource container |
+| `GET` | `/api/v1/shares` | List all shares for a vault |
+| `DELETE` | `/api/v1/shares` | Revoke a share and all access |
+| `POST` | `/api/v1/shares/invite` | Send invitation to user or email |
+| `POST` | `/api/v1/shares/invite/accept` | Accept an invitation token |
+| `POST` | `/api/v1/shares/links` | Create password-protected share link |
+| `POST` | `/api/v1/shares/links/revoke` | Revoke a share link token |
+| `POST` | `/api/v1/shares/comments` | Add threaded comment or reply |
+| `GET` | `/api/v1/shares/comments` | List comments for a share |
+| `GET` | `/api/v1/shares/activity` | Get audit activity history for share |
+| `GET` | `/api/v1/shares/stats` | Vault collaboration stats (active shares, members, comments) |
+
+
 
 
 

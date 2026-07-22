@@ -145,6 +145,16 @@ This document tracks the comprehensive roadmap and action items to complete the 
   - 7 REST API endpoints (notifications, mark read, dismiss, action, digests, preferences, stats)
   - Web UI: NotificationCenter, DigestView, NotificationPreferencesView, `/notifications` page route
   - Mobile UI: NotificationList, NotificationDetail, NotificationPreferences
+- [x] Secure Sharing & Collaboration Platform:
+  - Database migration `021_create_sharing_tables.sql` (7 tables: shares, share_permissions, share_members, share_links, share_comments, share_activity, share_invitations)
+  - Granular Resource Types (ASSET, FOLDER, COLLECTION, CONTEXT, PROJECT, TIMELINE_VIEW, SEARCH_RESULT)
+  - Role-based Access Control (READ_ONLY, COMMENT_ONLY, EDIT, OWNER, CO_OWNER)
+  - Password-protected link sharing with expiration dates and download limits
+  - Threaded discussion comments, replies, and resolution state
+  - Auditable Activity Logging (viewed, downloaded, edited, commented, shared, permission changed, revoked)
+  - 11 REST API endpoints (shares, invites, links, comments, activity, stats)
+  - Web UI: ShareDialog, PermissionManager, CommentPanel, ActivityFeed, `/collaboration` page route
+  - Mobile UI: ShareSheet, PermissionList, CommentThread
   - 6/6 Go tests passing
 - [x] Reverse Persona Engine:
   - [x] Collect user interaction signals (ASSET_OPEN, SEARCH, PIN, UPLOAD, EDIT, CONTEXT_SWITCH, RELATIONSHIP_EXPLORE, COLLECTION_USE, TIME_OF_DAY, SEARCH_REFINEMENT, DASHBOARD_USAGE, FAVOURITE)
