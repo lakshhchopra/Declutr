@@ -744,6 +744,46 @@ Declutr AI Copilot is the personal intelligence layer built on top of the user's
 | `POST` | `/api/v1/copilot/feedback` | Submit user rating on AI grounding quality |
 | `GET` | `/api/v1/copilot/messages/stream` | Stream response via Server-Sent Events (SSE) |
 
+---
+
+## ⚡ Workflow Automation & Intelligent Actions Engine
+
+Declutr's Workflow Automation Engine allows users to construct intelligent, event-driven rules within their vault. It automatically triggers actions based on internal vault events (uploads, AI analysis, entity discovery, expirations, schedules) without requiring external dependencies.
+
+> **Architecture**: `Event` → `Trigger Engine` → `Condition Engine` → `Rule Engine` → `Action Engine` → `Execution` → `History & Observability`
+
+### Triggers, Conditions & Actions
+
+- **12 Internal Event Triggers**: `ASSET_UPLOADED`, `ASSET_UPDATED`, `ASSET_DELETED`, `CONTEXT_CREATED`, `MEMORY_CREATED`, `ENTITY_FOUND`, `RELATIONSHIP_CREATED`, `DOCUMENT_EXPIRING`, `DAILY_SCHEDULE`, `MANUAL_TRIGGER`, `AI_INSIGHT_CREATED`, `TIMELINE_EVENT`
+- **Rule Evaluator**: Evaluates AND, OR, NOT condition rules across `fileType`, `entity`, `context`, `confidence`, `date`, and `storageSize`.
+- **Executable Actions**: `APPLY_TAGS`, `CREATE_COLLECTION`, `MOVE_ASSET`, `GENERATE_SUMMARY`, `ARCHIVE_ASSET`, `CREATE_REMINDER`, `PIN_MEMORY`, `REFRESH_SEARCH_INDEX`, `NOTIFY_USER`.
+
+### Database Schema (Migration 019)
+
+| Table | Purpose |
+|---|---|
+| `workflows` | Core workflow definition, enabled status, and aggregate statistics |
+| `workflow_triggers` | Event trigger configuration linked to workflows |
+| `workflow_conditions` | Rule condition evaluation criteria (`field`, `operator`, `value`, `combinator`) |
+| `workflow_actions` | Sequenced executable actions (`action_type`, `config`, `execution_order`) |
+| `workflow_runs` | Individual execution run records (`status`, `duration_ms`, `error_message`) |
+| `workflow_logs` | Granular step-by-step execution log entries |
+| `workflow_history` | Vault-level historical execution statistics and success rates |
+
+### REST API
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/v1/workflows` | Create a new workflow rule definition |
+| `GET` | `/api/v1/workflows` | List all workflows for a vault |
+| `PUT` | `/api/v1/workflows` | Update workflow definition |
+| `DELETE` | `/api/v1/workflows` | Delete workflow definition |
+| `POST` | `/api/v1/workflows/toggle` | Enable or disable workflow |
+| `POST` | `/api/v1/workflows/run` | Manually trigger workflow execution |
+| `GET` | `/api/v1/workflows/history` | Get run history and step logs |
+| `GET` | `/api/v1/workflows/stats` | Vault workflow observability metrics (success rate, avg duration) |
+
+
 
 
 

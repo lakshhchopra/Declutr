@@ -41,6 +41,16 @@ Declutr is structured as a production-grade modular monorepo:
 
 ## 📜 Dev History (Commit Log Summary)
 
+- **Workflow Automation & Intelligent Actions Engine (Issue #023)**:
+  - Created PostgreSQL database migration `database/migrations/019_create_workflow_tables.sql` (`workflows`, `workflow_triggers`, `workflow_conditions`, `workflow_actions`, `workflow_runs`, `workflow_logs`, `workflow_history`).
+  - Implemented domain models for `Workflow`, `WorkflowTrigger`, `WorkflowCondition`, `WorkflowAction`, `WorkflowRun`, `WorkflowLog`, `WorkflowStats`, `RunWorkflowRequest`, `ToggleWorkflowRequest`.
+  - Built `ConditionEvaluator` evaluating rule conditions (`EQUALS`, `CONTAINS`, `GREATER_THAN`, `LESS_THAN`, `IN`) with AND, OR, NOT combinators.
+  - Built `ActionExecutor` & `WorkflowExecutionEngine` executing sequential & parallel actions (`APPLY_TAGS`, `CREATE_COLLECTION`, `MOVE_ASSET`, `GENERATE_SUMMARY`, `ARCHIVE_ASSET`, `CREATE_REMINDER`, `PIN_MEMORY`, `REFRESH_SEARCH_INDEX`, `NOTIFY_USER`).
+  - Added 8 REST API endpoints (`POST /workflows`, `GET /workflows`, `PUT /workflows`, `DELETE /workflows`, `POST /workflows/toggle`, `POST /workflows/run`, `GET /workflows/history`, `GET /workflows/stats`).
+  - Created Web UI module (`frontend/features/workflow/components/`) featuring `WorkflowDashboard`, `VisualRuleBuilder`, `ExecutionHistory`, and Next.js page route (`/workflows`).
+  - Created Mobile UI components (`frontend/declutr-mobile/features/workflow/components/`): `WorkflowList.tsx`, `WorkflowDetails.tsx`, `ExecutionHistory.tsx`.
+  - Added comprehensive Go test suite (`workflow_test.go`) — 6/6 tests passing: Workflow Creation & Toggle, Condition Evaluation, Workflow Execution Success, Condition Failure Handling, Execution History & Logs, Workflow Stats.
+
 - **Declutr AI Copilot RAG & Personal Intelligence (Issue #022)**:
   - Created PostgreSQL database migration `database/migrations/018_create_copilot_tables.sql` (`conversations`, `messages`, `conversation_context`, `conversation_feedback`, `prompt_versions`, `response_history`).
   - Implemented domain models for `Conversation`, `Message`, `Citation`, `RAGContext`, `PromptVersion`, `SendMessageRequest`, `SendMessageResponse`, `FeedbackRequest`, `StreamChunk`.

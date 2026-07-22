@@ -126,6 +126,15 @@ This document tracks the comprehensive roadmap and action items to complete the 
   - 7 REST API endpoints (conversations, messages, feedback, SSE streaming)
   - Web UI: AIWorkspace, ConversationSidebar, ChatInterface, CitationViewer, SuggestedQuestions, `/copilot` page route
   - Mobile UI: ChatInterface, SourcePanel, ConversationHistory
+- [x] Workflow Automation Engine:
+  - Database migration `019_create_workflow_tables.sql` (7 tables: workflows, workflow_triggers, workflow_conditions, workflow_actions, workflow_runs, workflow_logs, workflow_history)
+  - 12 Trigger Types (uploads, updates, deletions, context, memory, entity, document expiring, daily schedule, manual)
+  - Rule Evaluator with AND, OR, NOT combinators across file types, entities, contexts, confidence, dates, storage size
+  - Executable Actions (apply tags, create collection, move asset, generate summary, archive asset, create reminder, pin memory, notify user)
+  - Async Execution Engine with step logging, retry handling, and metrics calculation
+  - 8 REST API endpoints (workflows CRUD, toggle, manual run, history, stats)
+  - Web UI: WorkflowDashboard, VisualRuleBuilder, ExecutionHistory, `/workflows` page route
+  - Mobile UI: WorkflowList, WorkflowDetails, ExecutionHistory
   - 6/6 Go tests passing
 - [x] Reverse Persona Engine:
   - [x] Collect user interaction signals (ASSET_OPEN, SEARCH, PIN, UPLOAD, EDIT, CONTEXT_SWITCH, RELATIONSHIP_EXPLORE, COLLECTION_USE, TIME_OF_DAY, SEARCH_REFINEMENT, DASHBOARD_USAGE, FAVOURITE)

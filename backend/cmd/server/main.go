@@ -28,6 +28,9 @@ import (
 	searchApp "github.com/diablovocado/declutr/modules/search/application"
 	searchRepository "github.com/diablovocado/declutr/modules/search/repository"
 	searchTransport "github.com/diablovocado/declutr/modules/search/transport"
+	workflowApp "github.com/diablovocado/declutr/modules/workflow/application"
+	workflowRepository "github.com/diablovocado/declutr/modules/workflow/repository"
+	workflowTransport "github.com/diablovocado/declutr/modules/workflow/transport"
 	"github.com/diablovocado/declutr/pkg/health"
 	"github.com/diablovocado/declutr/shared/database"
 	"github.com/diablovocado/declutr/shared/middleware"
@@ -229,6 +232,31 @@ func main() {
 	})
 	http.HandleFunc("/api/v1/copilot/feedback", copilotAPI.SaveFeedback)
 	http.HandleFunc("/api/v1/copilot/messages/stream", copilotAPI.StreamMessage)
+
+	// Workflow Automation Engine Module initialization
+	// Pipeline: Event → Trigger Engine → Condition Engine → Rule Engine → Action Engine → Execution → History
+	workflowRepo := workflowRepository.NewInMemoryWorkflowRepository()
+	workflowSvc := workflowApp.NewWorkflowService(workflowRepo)
+	workflowEngine := workflowApp.NewWorkflowExecutionEngine(workflowSvc)
+	_ = workflowEngine // available for background event dispatching
+	workflowAPI := workflowTransport.NewWorkflowAPI(workflowSvc)
+
+	http.HandleFunc("/api/v1/workflows", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			workflowAPI.CreateWorkflow(w, r)
+		case http.MethodPut:
+			workflowAPI.UpdateWorkflow(w, r)
+		case http.MethodDelete:
+			workflowAPI.DeleteWorkflow(w, r)
+		default:
+			workflowAPI.ListWorkflows(w, r)
+		}
+	})
+	http.HandleFunc("/api/v1/workflows/toggle", workflowAPI.ToggleWorkflow)
+	http.HandleFunc("/api/v1/workflows/run", workflowAPI.RunWorkflow)
+	http.HandleFunc("/api/v1/workflows/history", workflowAPI.GetHistory)
+	http.HandleFunc("/api/v1/workflows/stats", workflowAPI.GetStats)
 
 	log.Println("Declutr Backend Running on :8080")
 
